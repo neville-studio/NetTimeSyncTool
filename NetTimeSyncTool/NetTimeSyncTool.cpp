@@ -22,6 +22,9 @@ WCHAR szNETWORKTIMESTRING[MAX_LOADSTRING];      // network time string
 WCHAR szBOOTTIMESTRING[MAX_LOADSTRING];         // boot time string
 WCHAR szOKs[MAX_LOADSTRING];                    // OK String
 WCHAR szERRORs[MAX_LOADSTRING];                 // Error String
+WCHAR szADD[MAX_LOADSTRING];                    // ADD String
+WCHAR szEDIT[MAX_LOADSTRING];                    // ADD String
+WCHAR szDELETE[MAX_LOADSTRING];                    // ADD String
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -47,7 +50,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     LoadStringW(hInstance, IDS_OPENTIME, szBOOTTIMESTRING, MAX_LOADSTRING);
     LoadStringW(hInstance, IDS_OK, szOKs, MAX_LOADSTRING);
     LoadStringW(hInstance, IDS_ERROR, szERRORs, MAX_LOADSTRING);
-
+    LoadStringW(hInstance, IDS_ADD, szADD, MAX_LOADSTRING);
+    LoadStringW(hInstance, IDS_EDIT, szEDIT, MAX_LOADSTRING);
+    LoadStringW(hInstance, IDS_DELETE, szDELETE, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
     globalFont = CreateFont(-16/*高*/, -8/*宽*/, 0, 0, 400 /*400表示正常字体*/,
         FALSE/*斜体?*/, FALSE/*下划线?*/, FALSE/*删除线?*/, DEFAULT_CHARSET,
@@ -206,7 +211,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static HBRUSH hBrush;
-    static HWND sysTime, boot;
+    static HWND sysTime, boot,addButton,deleteButton,editButton;
     static HBRUSH  hbrBkgnd;
     static HWND NTPServerList;
     static NTPResult ntp1;
@@ -250,10 +255,53 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             hInst,		 //当前程序实例句柄
             NULL);
         SendMessage(netTime, WM_SETFONT, (WPARAM)globalFont, NULL);
+        SendMessage(hWnd, WM_SETFONT, (WPARAM)globalFont, NULL);
         SetTimer(hWnd,                  // handle to main window 
             IDT_UPDATETIMER,            // timer identifier 
             10,                         // 10-second interval 
             (TIMERPROC)NULL);           // no timer callback 
+
+        addButton = CreateWindow(
+            L"BUTTON",  // Predefined class; Unicode assumed 
+            szADD,      // Button text 
+            WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
+            50,         // x position 
+            360,         // y position 
+            100,        // Button width
+            30,        // Button height
+            hWnd,     // Parent window
+            NULL,       // No menu.
+            (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE),
+            NULL);      // Pointer not needed.
+        SendMessage(addButton, WM_SETFONT, (WPARAM)globalFont, NULL);
+        editButton = CreateWindow(
+            L"BUTTON",  // Predefined class; Unicode assumed 
+            szEDIT,      // Button text 
+            WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
+            160,         // x position 
+            360,         // y position 
+            100,        // Button width
+            30,        // Button height
+            hWnd,     // Parent window
+            NULL,       // No menu.
+            (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE),
+            NULL);      // Pointer not needed.
+        SendMessage(editButton, WM_SETFONT, (WPARAM)globalFont, NULL);
+        deleteButton = CreateWindow(
+            L"BUTTON",  // Predefined class; Unicode assumed 
+            szDELETE,      // Button text 
+            WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
+            270,         // x position 
+            360,         // y position 
+            100,        // Button width
+            30,        // Button height
+            hWnd,     // Parent window
+            NULL,       // No menu.
+            (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE),
+            NULL);      // Pointer not needed.
+        SendMessage(deleteButton, WM_SETFONT, (WPARAM)globalFont, NULL);
+
+
         /*ListView_*/
         NTPServerList = CreateNTPServerList(hInst, hWnd);
         InitListView(hInst,NTPServerList);

@@ -19,7 +19,16 @@
 #define IDS_STATUS                      111
 #define IDS_OK                          112
 #define IDS_ERROR                       113
+#define IDS_ADD                         114
+#define IDS_DELETE                      115
+#define IDS_EDIT                        116
+#define IDS_UPDATE                      117
+#define IDS_SETTIME                     118
 #define IDR_MAINFRAME                   128
+#define IDD_ADDDIALOG                   132
+#define IDD_ADDDIALOG1                  133
+#define IDC_EDIT1                       1000
+#define ID_ACCELERATOR32772             32772
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -27,9 +36,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        132
-#define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1000
+#define _APS_NEXT_RESOURCE_VALUE        133
+#define _APS_NEXT_COMMAND_VALUE         32773
+#define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

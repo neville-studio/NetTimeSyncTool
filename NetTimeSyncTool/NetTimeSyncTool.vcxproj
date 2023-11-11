@@ -128,6 +128,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="GlobalNTPResultData.h" />
     <ClInclude Include="NetTimeSyncTool.h" />
     <ClInclude Include="NtpClient.h" />
     <ClInclude Include="NtpServerListUI.h" />
@@ -136,6 +137,7 @@
     <ClInclude Include="Time2String.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="GlobalNTPResultData.cpp" />
     <ClCompile Include="NetTimeSyncTool.cpp" />
     <ClCompile Include="ntpClient.cpp" />
     <ClCompile Include="NtpServerListUI.cpp" />
