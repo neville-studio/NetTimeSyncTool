@@ -86,7 +86,7 @@ BOOL InsertNTPViewItem(HWND hWndListView,NTPResult NTPitem)
     //OutputDebugString(to_wstring(NTPitem.fromIP.size()).c_str());
     wcscpy_s(serverIP, NTPitem.fromIP.size()+1, NTPitem.fromIP.c_str());
     item.mask = LVIF_TEXT;
-    item.iItem = 0;
+    item.iItem = ListView_GetItemCount(hWndListView);
     item.iSubItem = 0;
     item.pszText = serverName;
     ListView_InsertItem(hWndListView, &item);

@@ -7,7 +7,9 @@
 #include "NtpServerListUI.h"
 #include "NtpClient.h"
 #include <string>
+#include <vector>
 #include <CommCtrl.h>
+#include "GlobalNTPResultData.h"
 #define MAX_LOADSTRING 100
 #define IDT_UPDATETIMER 1001
 #pragma comment(linker,"\"/manifestdependency:type='win32' \
@@ -31,7 +33,11 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK    Add(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK    Edit(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+
 HFONT globalFont;
+GlobalData ntpServers;
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
@@ -215,6 +221,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     static HBRUSH  hbrBkgnd;
     static HWND NTPServerList;
     static NTPResult ntp1;
+    static int selectedListId;
     switch (message)
     {
     case WM_CREATE:
@@ -304,17 +311,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         /*ListView_*/
         NTPServerList = CreateNTPServerList(hInst, hWnd);
+        
         InitListView(hInst,NTPServerList);
         
-        char baseServer[256] = "ntp2.aliyun.com";
-        
-        int baseServerResult = getNTPTime(baseServer, ntp1);
-        InsertNTPViewItem(NTPServerList, ntp1);
-        if (baseServerResult) {
-            setItemStatus(NTPServerList, 0, szERRORs);
-        }
-        else {
-            setItemStatus(NTPServerList, 0, szOKs);
+        char baseServer[3][256] = { "ntp.aliyun.com","ntp2.aliyun.com","time.windows.com" };
+        for (int i = 0; i < 3; i++) {
+            NTPResult ntpresult;
+            ntpServers.globalData.push_back(ntpresult);
+            int baseServerResult = getNTPTime(baseServer[i], ntpServers.globalData[i]);
+            InsertNTPViewItem(NTPServerList, ntpServers.globalData[i]);
+            if (baseServerResult) {
+                setItemStatus(NTPServerList, i, szERRORs);
+            }
+            else {
+                setItemStatus(NTPServerList, i, szOKs);
+            }
         }
     }   
     break;
@@ -348,15 +359,54 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_COMMAND:
         {
-            int wmId = LOWORD(wParam);
-            // Parse the menu selections:
-            switch (wmId)
+            //int wmId = LOWORD(wParam);
+            //// Parse the menu selections:
+            //switch (wmId)
+            //{
+            //default:
+            //    return DefWindowProc(hWnd, message, wParam, lParam);
+            //}
+            if (lParam == (LPARAM)addButton) {
+                if (ListView_GetItemCount(NTPServerList) >= 10)
+                {
+                    int okAdd = MessageBox(hWnd,L"当前列表中有十个及以上的的网络时钟服务器了，如果继续添加，此时间UI会不稳定，是否继续？",L"添加提示",MB_OKCANCEL);
+                    if(okAdd == IDCANCEL)return DefWindowProc(hWnd, message, wParam, lParam);
+                }
+                DialogBox(hInst, MAKEINTRESOURCE(IDD_ADDDIALOG), hWnd, Add);
+                return DefWindowProc(hWnd, message, wParam, lParam);
+            }
+            else if (lParam == (LPARAM)editButton && ListView_GetSelectedCount(NTPServerList))
             {
-            default:
+                DialogBox(hInst, MAKEINTRESOURCE(IDD_ADDDIALOG), hWnd, Edit);
+                return DefWindowProc(hWnd, message, wParam, lParam);
+            }
+            else if (lParam == (LPARAM)deleteButton && ListView_GetSelectedCount(NTPServerList)) {
+                
+                int okDelete = MessageBox(hWnd, L"是否删除此时间服务器？", L"删除提示", MB_OKCANCEL);
+                if (okDelete == IDOK) {
+                    /*LV_ITEM item;
+                    item.iItem = selectedListId;
+                    ListView*/
+                    ListView_DeleteItem(NTPServerList, selectedListId+1);
+                    ntpServers.globalData.erase(ntpServers.globalData.begin()+selectedListId);
+                    selectedListId = -1;
+                }
+            }
+            else{
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }
         }
         break;
+    case WM_NOTIFY:
+    {
+        if (wParam == (WPARAM)NTPServerList) {
+            LPNMITEMACTIVATE activeItem;
+            activeItem = (LPNMITEMACTIVATE)lParam;
+            selectedListId = activeItem->iItem;
+            
+        }
+        break;
+    }
     case WM_PAINT:
         {
         
@@ -372,8 +422,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             DeleteObject(hBmp);
 
             DeleteDC(hdc);
-            if (hWnd == NTPServerList)
-                OutputDebugString(L"NTP Server List\n");
+            
             ReleaseDC(hWnd, hdc); //释放 
             EndPaint(hWnd, &ps);
         }
@@ -401,8 +450,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     GetWindowText(boot, compareTime, 64);
                     if (wcscmp(compareTime, bootTimeStr.c_str()))
                     SetWindowText(boot, bootTimeStr.c_str());
-                   
-                    UpdateNTPTime(NTPServerList, 0, ntp1);
+                    int i = 0; 
+                    for (NTPResult ntp : ntpServers.globalData)
+                        UpdateNTPTime(NTPServerList, i++, ntp);
+                    
                     return 0;
             }
         }
@@ -412,6 +463,43 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
+INT_PTR CALLBACK Edit(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    UNREFERENCED_PARAMETER(lParam);
+    switch (message)
+    {
+    case WM_INITDIALOG:
+        return (INT_PTR)TRUE;
+
+    case WM_COMMAND:
+        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+        {
+            EndDialog(hDlg, LOWORD(wParam));
+            return (INT_PTR)TRUE;
+        }
+        break;
+    }
+    return (INT_PTR)FALSE;
+}
+
+INT_PTR CALLBACK Add(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    UNREFERENCED_PARAMETER(lParam);
+    switch (message)
+    {
+    case WM_INITDIALOG:
+        return (INT_PTR)TRUE;
+
+    case WM_COMMAND:
+        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+        {
+            EndDialog(hDlg, LOWORD(wParam));
+            return (INT_PTR)TRUE;
+        }
+        break;
+    }
+    return (INT_PTR)FALSE;
+}
 // Message handler for about box.
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
