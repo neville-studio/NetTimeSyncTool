@@ -133,7 +133,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    HWND hWnd = CreateWindowExW(NULL,szWindowClass, szTitle, (WS_OVERLAPPEDWINDOW ^ WS_SIZEBOX ^ WS_MAXIMIZE ^ WS_MAXIMIZEBOX) | WS_CLIPCHILDREN,
       CW_USEDEFAULT, 0, 750, 500, nullptr, nullptr, hInstance, nullptr);
-
+   
    if (!hWnd)
    {
       return FALSE;
@@ -221,7 +221,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     static HBRUSH  hbrBkgnd;
     static HWND NTPServerList;
     static NTPResult ntp1;
-    static int selectedListId;
+    static int selectedListId = -1;
     switch (message)
     {
     case WM_CREATE:
@@ -234,7 +234,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             hInst,		 //当前程序实例句柄
             NULL);
         SendMessage(systemTime, WM_SETFONT, (WPARAM)globalFont, NULL);
-        sysTime = CreateWindowEx(WS_EX_TRANSPARENT  ,L"static", L"", WS_CHILD | WS_VISIBLE | SS_LEFT | WS_CLIPSIBLINGS ,
+        sysTime = CreateWindowEx(WS_EX_TRANSPARENT  ,L"static", L"", WS_CHILD | WS_VISIBLE | SS_LEFT | WS_CLIPCHILDREN,
             175 /*X坐标*/, 10, 300, 25,
             hWnd,		 //父窗口句柄
             (HMENU)1,	 //为控件指定一个唯一标识符
@@ -248,7 +248,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             hInst,		 //当前程序实例句柄
             NULL);
         SendMessage(bootTime, WM_SETFONT, (WPARAM)globalFont, NULL);
-        boot = CreateWindowEx(WS_EX_TRANSPARENT , L"static", L"", WS_CHILD | WS_VISIBLE | SS_LEFT | WS_CLIPSIBLINGS,
+        boot = CreateWindowEx(WS_EX_TRANSPARENT , L"static", L"", WS_CHILD | WS_VISIBLE | SS_LEFT | WS_CLIPCHILDREN,
             175 /*X坐标*/, 40, 125, 25,
             hWnd,		 //父窗口句柄
             (HMENU)1,	 //为控件指定一个唯一标识符
@@ -277,7 +277,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             100,        // Button width
             30,        // Button height
             hWnd,     // Parent window
-            NULL,       // No menu.
+            (HMENU)12,       // No menu.
             (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE),
             NULL);      // Pointer not needed.
         SendMessage(addButton, WM_SETFONT, (WPARAM)globalFont, NULL);
@@ -290,7 +290,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             100,        // Button width
             30,        // Button height
             hWnd,     // Parent window
-            NULL,       // No menu.
+            (HMENU)13,       // No menu.
             (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE),
             NULL);      // Pointer not needed.
         SendMessage(editButton, WM_SETFONT, (WPARAM)globalFont, NULL);
@@ -303,7 +303,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             100,        // Button width
             30,        // Button height
             hWnd,     // Parent window
-            NULL,       // No menu.
+            (HMENU)14,       // No menu.
             (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE),
             NULL);      // Pointer not needed.
         SendMessage(deleteButton, WM_SETFONT, (WPARAM)globalFont, NULL);
@@ -387,7 +387,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     /*LV_ITEM item;
                     item.iItem = selectedListId;
                     ListView*/
-                    ListView_DeleteItem(NTPServerList, selectedListId+1);
+                    ListView_DeleteItem(NTPServerList, selectedListId);
                     ntpServers.globalData.erase(ntpServers.globalData.begin()+selectedListId);
                     selectedListId = -1;
                 }
@@ -399,10 +399,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_NOTIFY:
     {
-        if (wParam == (WPARAM)NTPServerList) {
-            LPNMITEMACTIVATE activeItem;
-            activeItem = (LPNMITEMACTIVATE)lParam;
-            selectedListId = activeItem->iItem;
+        LPNMHDR  lpnmh = (LPNMHDR)lParam;
+       
+        if (lpnmh->code==NM_CLICK && lpnmh->hwndFrom ==NTPServerList) {
+            /*LPNMITEMACTIVATE activeItem;
+            activeItem = (LPNMITEMACTIVATE)lParam;*/
+            selectedListId = ListView_GetSelectionMark(NTPServerList);
             
         }
         break;

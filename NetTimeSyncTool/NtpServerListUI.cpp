@@ -14,13 +14,13 @@ HWND CreateNTPServerList(HINSTANCE hInst, HWND hWnd)
     BOOL        bSuccess = TRUE;
 
     dwStyle = //WS_TABSTOP |
-        WS_CHILD |
+        WS_CHILD | WS_CLIPCHILDREN |
         WS_BORDER |
         WS_VISIBLE |
         
         LVS_REPORT ;
 
-    hwndListView = CreateWindowEx(LVS_EX_DOUBLEBUFFER,  // ex style
+    hwndListView = CreateWindowEx(LVS_EX_DOUBLEBUFFER ,  // ex style
         WC_LISTVIEW,                     // class name - defined in commctrl.h
         TEXT(""),                        // dummy text
         dwStyle,                         // style
@@ -32,10 +32,12 @@ HWND CreateNTPServerList(HINSTANCE hInst, HWND hWnd)
         (HMENU)10,                       // ID
         hInst,                           // instance
         NULL);                           // no extra data
+    ListView_SetExtendedListViewStyleEx(hwndListView, LVS_EX_DOUBLEBUFFER, LVS_EX_DOUBLEBUFFER);    // This code is to enable ListView's Double 
     //ListView_SetBkColor(hwndListView, CLR_NONE);
-    ListView_SetTextBkColor(hwndListView, CLR_NONE);
+    //ListView_SetTextBkColor(hwndListView, CLR_NONE);
     return hwndListView;
 }
+
 BOOL InitListView(HINSTANCE hInstance,HWND hwndListView)
 {
     LV_COLUMN   lvColumn;
@@ -79,6 +81,7 @@ BOOL InsertListViewItems(HWND hwndListView)
 
 BOOL InsertNTPViewItem(HWND hWndListView,NTPResult NTPitem)
 {
+    
     LV_ITEM item;
     WCHAR serverName[256];
     WCHAR serverIP[16]=L"";
