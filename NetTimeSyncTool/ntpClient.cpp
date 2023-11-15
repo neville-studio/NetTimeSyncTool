@@ -196,7 +196,10 @@ int getNTPTime(char * ntpServerName, NTPResult &NTPres)
             WSACleanup();
             return 1;
         }
+        DWORD timeout = 5000;
 
+        setsockopt(ConnectSocket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(timeout));
+        setsockopt(ConnectSocket, SOL_SOCKET, SO_SNDTIMEO, (const char*)&timeout, sizeof(timeout));
         // Connect to server.
         iResult = connect(ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
         if (iResult == SOCKET_ERROR) {
@@ -239,7 +242,7 @@ int getNTPTime(char * ntpServerName, NTPResult &NTPres)
 
     // Receive until the peer closes the connection
     //do {
-
+    NTPres.serverName = _bstr_t(ntpServerName);
         iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
         if (iResult > 0) {
 
@@ -289,16 +292,30 @@ int getNTPTime(char * ntpServerName, NTPResult &NTPres)
             NTPres.fromIP = transmitToIP(ntpTransmit.referenceIdentifier);
             NTPres.updateTime = GetTickCount64();
             NTPres.timeStamp = currentTimeStamp;
-            NTPres.serverName = _bstr_t(ntpServerName);
+            NTPres.status = 0;
+            
             //time(&now);
             //printf("time:%lld", now);
 
 
         }
         else if (iResult == 0)
+        {
             printf("Connection closed\n");
+            closesocket(ConnectSocket);
+            WSACleanup();
+            NTPres.status = -12;
+            return 1;
+        }
         else
+        {
             printf("recv failed with error: %d\n", WSAGetLastError());
+            
+            NTPres.status = WSAGetLastError();
+            closesocket(ConnectSocket);
+            WSACleanup();
+            return iResult;
+        }
 
     //} while (iResult > 0);
 

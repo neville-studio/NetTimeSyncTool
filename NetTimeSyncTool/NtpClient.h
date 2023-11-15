@@ -7,7 +7,7 @@ public:
 	wstring fromIP;
 	wstring serverName;
 	unsigned long long timeStamp = 0;
-	
+	int status = -1;
 	int versionNumber = 3;
 	int leap = 0;
 	unsigned long long updateTime = 0;

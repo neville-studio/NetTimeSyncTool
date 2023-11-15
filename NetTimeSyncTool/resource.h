@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by NetTimeSyncTool.rc
+// Microsoft Visual C++ 生成的包含文件。
+// 供 NetTimeSyncTool.rc 使用
 //
 #define IDC_MYICON                      2
 #define IDD_NETTIMESYNCTOOL_DIALOG      102
@@ -28,6 +28,7 @@
 #define IDD_ADDDIALOG                   132
 #define IDD_ADDDIALOG1                  133
 #define IDC_EDIT1                       1000
+#define IDC_SERVER                      1001
 #define ID_ACCELERATOR32772             32772
 #define IDC_STATIC                      -1
 
@@ -38,7 +39,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        133
 #define _APS_NEXT_COMMAND_VALUE         32773
-#define _APS_NEXT_CONTROL_VALUE         1001
+#define _APS_NEXT_CONTROL_VALUE         1002
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif
