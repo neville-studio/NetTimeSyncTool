@@ -7,3 +7,4 @@ BOOL InsertListViewItems(HWND hwndListView);
 BOOL InsertNTPViewItem(HWND hWndListView, NTPResult NTPitem);
 BOOL UpdateNTPTime(HWND hWndListView, int num, NTPResult res);
 BOOL setItemStatus(HWND hWndListView, int num, wstring status);
+BOOL setNTPItem(HWND hWndListView, int num, NTPResult res);

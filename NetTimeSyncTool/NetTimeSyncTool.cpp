@@ -146,66 +146,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    return TRUE;
 }
-
-
-
-
-
-//HWND CreateListView(HINSTANCE hInstance, HWND hwndParent)
-//{
-//    DWORD       dwStyle;
-//    HWND        hwndListView;
-//    BOOL        bSuccess = TRUE;
-//
-//    dwStyle = WS_TABSTOP |
-//        WS_CHILD |
-//        WS_BORDER |
-//        WS_VISIBLE |
-//        LVS_AUTOARRANGE |
-//        LVS_REPORT |
-//        LVS_OWNERDATA;
-//
-//    hwndListView = CreateWindowEx(WS_EX_CLIENTEDGE,          // ex style
-//        WC_LISTVIEW,               // class name - defined in commctrl.h
-//        TEXT(""),                        // dummy text
-//        dwStyle,                   // style
-//        0,                         // x position
-//        0,                         // y position
-//        0,                         // width
-//        0,                         // height
-//        hwndParent,                // parent
-//        (HMENU)ID_LISTVIEW,        // ID
-//        g_hInst,                   // instance
-//        NULL);                     // no extra data
-//
-//    if (!hwndListView)
-//        return NULL;
-//
-//    ResizeListView(hwndListView, hwndParent);
-//
-//    //set the image lists
-//    himlSmall = ImageList_Create(16, 16, ILC_COLORDDB | ILC_MASK, 1, 0);
-//    himlLarge = ImageList_Create(32, 32, ILC_COLORDDB | ILC_MASK, 1, 0);
-//
-//    if (himlSmall && himlLarge)
-//    {
-//        HICON hIcon;
-//
-//        //set up the small image list
-//        hIcon = LoadImage(g_hInst, MAKEINTRESOURCE(IDI_DISK), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
-//        ImageList_AddIcon(himlSmall, hIcon);
-//
-//        //set up the large image list
-//        hIcon = LoadIcon(g_hInst, MAKEINTRESOURCE(IDI_DISK));
-//        ImageList_AddIcon(himlLarge, hIcon);
-//
-//        ListView_SetImageList(hwndListView, himlSmall, LVSIL_SMALL);
-//        ListView_SetImageList(hwndListView, himlLarge, LVSIL_NORMAL);
-//    }
-//
-//    return hwndListView;
-//}
-
 //
 //  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
 //
@@ -217,6 +157,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 //
 static HWND NTPServerList;
+static int selectedListId = -1;
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static HBRUSH hBrush;
@@ -224,7 +165,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     static HBRUSH  hbrBkgnd;
     
     static NTPResult ntp1;
-    static int selectedListId = -1;
+    
     switch (message)
     {
     case WM_CREATE:
@@ -479,15 +420,43 @@ INT_PTR CALLBACK Edit(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     switch (message)
     {
     case WM_INITDIALOG:
+    {
+        Edit_SetText(GetDlgItem(hDlg, IDC_SERVER), ntpServers.globalData[selectedListId].serverName.c_str());
         return (INT_PTR)TRUE;
-
+    }
     case WM_COMMAND:
-        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+        if (LOWORD(wParam) == IDCANCEL)
         {
             EndDialog(hDlg, LOWORD(wParam));
             return (INT_PTR)TRUE;
         }
-        break;
+        else if (LOWORD(wParam) == IDOK)
+        {
+            SetWindowText(hDlg, L"请等候5秒，正在获取信息....");
+            char servername[256] = {};
+            WCHAR dlgItem[256] = {};
+            Edit_GetText(GetDlgItem(hDlg, IDC_SERVER), dlgItem, 256);
+            size_t convertChar = 256;
+            wcstombs_s(&convertChar, servername, dlgItem, 256);
+
+            NTPResult ntp;
+            int res = getNTPTime(servername, ntp);
+            /*delete& (ntpServers.globalData[selectedListId]);*/
+            ntpServers.globalData[selectedListId] = ntp;
+            setNTPItem(NTPServerList,selectedListId,ntp);
+            if (res) {
+                WCHAR error[64] = L"";
+                swprintf_s(error, 64, szERRORs, ntp.status);
+                setItemStatus(NTPServerList, selectedListId, error);
+            }
+            else {
+                setItemStatus(NTPServerList, selectedListId, szOKs);
+            }
+            selectedListId = -1;
+            EndDialog(hDlg, LOWORD(wParam));
+            return (INT_PTR)TRUE;
+
+        }
     }
     return (INT_PTR)FALSE;
 }
@@ -498,6 +467,9 @@ INT_PTR CALLBACK Add(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     switch (message)
     {
     case WM_INITDIALOG:
+    
+        
+    
         return (INT_PTR)TRUE;
 
     case WM_COMMAND:
@@ -522,7 +494,6 @@ INT_PTR CALLBACK Add(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
             
             if (res) {
                 WCHAR error[64] = L"";
-                
                 swprintf_s(error,64,szERRORs,ntp.status);
                 setItemStatus(NTPServerList, ListView_GetItemCount(NTPServerList)-1, error);
             }

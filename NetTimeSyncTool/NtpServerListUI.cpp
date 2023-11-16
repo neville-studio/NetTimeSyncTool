@@ -124,7 +124,7 @@ BOOL UpdateNTPTime(HWND hWndListView, int num, NTPResult res)
     }
     return TRUE;
 }
-BOOL setItem(HWND hWndListView, int num, NTPResult res)
+BOOL setNTPItem(HWND hWndListView, int num, NTPResult res)
 {
     LV_ITEM item;
     item.mask = LVIF_TEXT;
@@ -141,6 +141,10 @@ BOOL setItem(HWND hWndListView, int num, NTPResult res)
     ListView_SetItem(hWndListView, &item);
     item.iSubItem = 1;
     item.pszText = serverIP;
+    ListView_SetItem(hWndListView, &item);
+    item.iSubItem = 2;
+    WCHAR WinTime[64] = {};
+    item.pszText = WinTime;
     ListView_SetItem(hWndListView, &item);
     return TRUE;
 }
