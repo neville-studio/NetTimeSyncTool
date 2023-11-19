@@ -167,6 +167,7 @@ int getNTPTime(char * ntpServerName, NTPResult &NTPres)
 
     // Initialize Winsock
     NTPres.serverName = _bstr_t(ntpServerName);
+    NTPres.fromIP = L"";
     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (iResult != 0) {
         //printf("WSAStartup failed with error: %d\n", iResult);

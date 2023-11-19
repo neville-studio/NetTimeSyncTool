@@ -12,6 +12,7 @@
 #include <windowsx.h>
 #include <wchar.h>
 #include "GlobalNTPResultData.h"
+#include <comdef.h>
 #define MAX_LOADSTRING 100
 #define IDT_UPDATETIMER 1001
 #pragma comment(linker,"\"/manifestdependency:type='win32' \
@@ -307,7 +308,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         NTPServerList = CreateNTPServerList(hInst, hWnd);
         
         InitListView(hInst,NTPServerList);
+        for (int i = 0; i < ntpServers.servers.size(); i++)
+        {
+            NTPResult ntp;
+            ntp.serverName = _bstr_t(ntpServers.servers[i].c_str());
+            ntpServers.globalData.push_back(ntp);
+            InsertNTPViewItem(NTPServerList, ntpServers.globalData[i]);
+
+            /*if (baseServerResult) {
+                setItemStatus(NTPServerList, i, szERRORs);
+            }
+            else {
+                setItemStatus(NTPServerList, i, szOKs);
+            }*/
+        }
+        EnableWindow(updateButton, FALSE);
+        DWORD currentThreadId = GetCurrentThreadId();
+        CreateThread(NULL, 0, resync, &currentThreadId, 0, NULL);
         
+       
         /*char baseServer[3][256] = { "ntp.aliyun.com","ntp2.aliyun.com","time.windows.com" };
         */
     }   

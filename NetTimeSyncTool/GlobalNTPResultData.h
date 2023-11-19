@@ -6,4 +6,6 @@ class GlobalData {
 public:
 	vector<NTPResult> globalData;
 	GlobalData();
+	vector <string> servers;
+	~GlobalData();
 };
