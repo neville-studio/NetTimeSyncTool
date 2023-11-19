@@ -166,10 +166,11 @@ int getNTPTime(char * ntpServerName, NTPResult &NTPres)
     }*/
 
     // Initialize Winsock
+    NTPres.serverName = _bstr_t(ntpServerName);
     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (iResult != 0) {
         //printf("WSAStartup failed with error: %d\n", iResult);
-        return 1;
+        return iResult;
     }
 
     ZeroMemory(&hints, sizeof(hints));
@@ -182,7 +183,7 @@ int getNTPTime(char * ntpServerName, NTPResult &NTPres)
     if (iResult != 0) {
         //printf("getaddrinfo failed with error: %d\n", iResult);
         WSACleanup();
-        return 1;
+        return iResult;
     }
 
     // Attempt to connect to an address until one succeeds
@@ -194,7 +195,7 @@ int getNTPTime(char * ntpServerName, NTPResult &NTPres)
         if (ConnectSocket == INVALID_SOCKET) {
             //printf("socket failed with error: %ld\n", WSAGetLastError());
             WSACleanup();
-            return 1;
+            return iResult;
         }
         DWORD timeout = 5000;
 
@@ -242,7 +243,7 @@ int getNTPTime(char * ntpServerName, NTPResult &NTPres)
 
     // Receive until the peer closes the connection
     //do {
-    NTPres.serverName = _bstr_t(ntpServerName);
+    
         iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
         if (iResult > 0) {
 

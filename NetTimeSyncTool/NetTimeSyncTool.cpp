@@ -27,8 +27,16 @@ WCHAR szBOOTTIMESTRING[MAX_LOADSTRING];         // boot time string
 WCHAR szOKs[MAX_LOADSTRING];                    // OK String
 WCHAR szERRORs[MAX_LOADSTRING];                 // Error String
 WCHAR szADD[MAX_LOADSTRING];                    // ADD String
-WCHAR szEDIT[MAX_LOADSTRING];                    // ADD String
-WCHAR szDELETE[MAX_LOADSTRING];                    // ADD String
+WCHAR szEDIT[MAX_LOADSTRING];                   // EDIT String
+WCHAR szADDTip[MAX_LOADSTRING];                 // ADD Tip String
+WCHAR szADDTipTitle[MAX_LOADSTRING];            // Add tip title String
+WCHAR szUpdate[MAX_LOADSTRING];            // Add tip title String
+WCHAR szDELETE[MAX_LOADSTRING];                 // DELETE String
+WCHAR szDELETETip[MAX_LOADSTRING];                 // ADD Tip String
+WCHAR szDELETETipTitle[MAX_LOADSTRING];            // Add tip title String
+WCHAR szWaitTitle[MAX_LOADSTRING];            // Add tip title String
+static HWND NTPServerList;
+static int selectedListId = -1;
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -40,6 +48,7 @@ INT_PTR CALLBACK    Edit(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
 HFONT globalFont;
 GlobalData ntpServers;
+bool OKSync = false;
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
@@ -61,6 +70,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     LoadStringW(hInstance, IDS_ADD, szADD, MAX_LOADSTRING);
     LoadStringW(hInstance, IDS_EDIT, szEDIT, MAX_LOADSTRING);
     LoadStringW(hInstance, IDS_DELETE, szDELETE, MAX_LOADSTRING);
+    LoadStringW(hInstance, IDS_ADDTIP, szADDTip, MAX_LOADSTRING);
+    LoadStringW(hInstance, IDS_ADDTIPTITLE, szADDTipTitle, MAX_LOADSTRING);
+    LoadStringW(hInstance, IDS_DELETETIP, szDELETETip, MAX_LOADSTRING);
+    LoadStringW(hInstance, IDS_DELETETIPTITLE, szDELETETipTitle, MAX_LOADSTRING);
+    LoadStringW(hInstance, IDS_WAIT, szWaitTitle, MAX_LOADSTRING);
+    LoadStringW(hInstance, IDS_UPDATE, szUpdate, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
     globalFont = CreateFont(-16/*高*/, -8/*宽*/, 0, 0, 400 /*400表示正常字体*/,
         FALSE/*斜体?*/, FALSE/*下划线?*/, FALSE/*删除线?*/, DEFAULT_CHARSET,
@@ -133,7 +148,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // Store instance handle in our global variable
 
-   HWND hWnd = CreateWindowExW(NULL,szWindowClass, szTitle, (WS_OVERLAPPEDWINDOW ^ WS_SIZEBOX ^ WS_MAXIMIZE ^ WS_MAXIMIZEBOX) | WS_CLIPCHILDREN,
+   HWND hWnd = CreateWindowExW(NULL,szWindowClass, szTitle, (WS_OVERLAPPEDWINDOW ^ WS_SIZEBOX ^ WS_MAXIMIZE ^ WS_MAXIMIZEBOX),
       CW_USEDEFAULT, 0, 750, 500, nullptr, nullptr, hInstance, nullptr);
    
    if (!hWnd)
@@ -146,6 +161,29 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    return TRUE;
 }
+DWORD WINAPI resync(LPVOID lparam)
+{
+    for (int i = 0; i < ntpServers.globalData.size(); i++) {
+        char servername[256] = {};
+        WCHAR dlgItem[256] = {};
+        wcscpy_s(dlgItem, ntpServers.globalData[i].serverName.c_str());
+        size_t convertChar = 256;
+        wcstombs_s(&convertChar, servername, dlgItem, 256);
+        int baseServerResult = getNTPTime(servername, ntpServers.globalData[i]);
+        //InsertNTPViewItem(NTPServerList, ntpServers.globalData[i]);
+        /*if (baseServerResult) {
+            setItemStatus(NTPServerList, i, szERRORs);
+        }
+        else {
+            setItemStatus(NTPServerList, i, szOKs);
+        }*/
+    }
+    OKSync = true;
+    return 0;
+}
+
+
+
 //
 //  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
 //
@@ -156,12 +194,11 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - post a quit message and return
 //
 //
-static HWND NTPServerList;
-static int selectedListId = -1;
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static HBRUSH hBrush;
-    static HWND sysTime, boot,addButton,deleteButton,editButton;
+    static HWND sysTime, boot,addButton,deleteButton,editButton,updateButton;
     static HBRUSH  hbrBkgnd;
     
     static NTPResult ntp1;
@@ -251,6 +288,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE),
             NULL);      // Pointer not needed.
         SendMessage(deleteButton, WM_SETFONT, (WPARAM)globalFont, NULL);
+        updateButton = CreateWindow(
+            L"BUTTON",  // Predefined class; Unicode assumed 
+            szUpdate,      // Button text 
+            WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
+            400,         // x position 
+            360,         // y position 
+            100,        // Button width
+            30,        // Button height
+            hWnd,     // Parent window
+            (HMENU)14,       // No menu.
+            (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE),
+            NULL);      // Pointer not needed.
+        SendMessage(updateButton, WM_SETFONT, (WPARAM)globalFont, NULL);
 
 
         /*ListView_*/
@@ -259,18 +309,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         InitListView(hInst,NTPServerList);
         
         /*char baseServer[3][256] = { "ntp.aliyun.com","ntp2.aliyun.com","time.windows.com" };
-        for (int i = 0; i < 3; i++) {
-            NTPResult ntpresult;
-            ntpServers.globalData.push_back(ntpresult);
-            int baseServerResult = getNTPTime(baseServer[i], ntpServers.globalData[i]);
-            InsertNTPViewItem(NTPServerList, ntpServers.globalData[i]);
-            if (baseServerResult) {
-                setItemStatus(NTPServerList, i, szERRORs);
-            }
-            else {
-                setItemStatus(NTPServerList, i, szOKs);
-            }
-        }*/
+        */
     }   
     break;
     case WM_ERASEBKGND:
@@ -313,7 +352,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             if (lParam == (LPARAM)addButton) {
                 if (ListView_GetItemCount(NTPServerList) >= 10)
                 {
-                    int okAdd = MessageBox(hWnd,L"当前列表中有十个及以上的的网络时钟服务器了，如果继续添加，此时间UI会不稳定，是否继续？",L"添加提示",MB_OKCANCEL);
+                    int okAdd = MessageBox(hWnd,szADDTip,szADDTipTitle,MB_OKCANCEL);
                     if(okAdd == IDCANCEL)return DefWindowProc(hWnd, message, wParam, lParam);
                 }
                 DialogBox(hInst, MAKEINTRESOURCE(IDD_ADDDIALOG), hWnd, Add);
@@ -326,7 +365,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
             else if (lParam == (LPARAM)deleteButton && ListView_GetSelectedCount(NTPServerList)) {
                 
-                int okDelete = MessageBox(hWnd, L"是否删除此时间服务器？", L"删除提示", MB_OKCANCEL);
+                int okDelete = MessageBox(hWnd, szDELETETip, szDELETETipTitle, MB_OKCANCEL);
                 if (okDelete == IDOK) {
                     /*LV_ITEM item;
                     item.iItem = selectedListId;
@@ -335,6 +374,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     ntpServers.globalData.erase(ntpServers.globalData.begin()+selectedListId);
                     selectedListId = -1;
                 }
+            }
+            else if (lParam == (LPARAM)updateButton)
+            {
+                EnableWindow(updateButton, FALSE);
+                DWORD currentThreadId = GetCurrentThreadId();
+                CreateThread(NULL, 0, resync,&currentThreadId, 0, NULL);
             }
             else{
                 return DefWindowProc(hWnd, message, wParam, lParam);
@@ -381,11 +426,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             case IDT_UPDATETIMER: 
             {
+                if (OKSync) { SendMessage(hWnd, WM_USER + 1, NULL, NULL); OKSync = false; }
                 // process the 10-second timer 
                 FILETIME fileTime;
                 GetSystemTimeAsFileTime(&fileTime);
                 std::wstring systemTimeStr;
-            
+                
                     systemTimeStr = FileTime2SystemTime(fileTime);
                     WCHAR compareTime[64];
                     GetWindowText(sysTime, compareTime, 64);
@@ -408,6 +454,37 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     return 0;
             }
         }
+    case WM_USER + 1:
+    {
+
+        char servername[256] = {};
+        WCHAR dlgItem[256] = {};
+        size_t convertChar = 256;
+        wcstombs_s(&convertChar, servername, dlgItem, 256);
+
+        //NTPResult ntp;
+        int i = 0;
+        for (NTPResult ntp : ntpServers.globalData) {
+            //int res = getNTPTime(servername, ntp);
+            /*delete& (ntpServers.globalData[selectedListId]);*/
+            //ntpServers.globalData[selectedListId] = ntp;
+            setNTPItem(NTPServerList, i, ntp);
+            if (ntp.status) {
+                WCHAR error[64] = L"";
+                swprintf_s(error, 64, szERRORs, ntp.status);
+                setItemStatus(NTPServerList, i, error);
+            }
+            else {
+                setItemStatus(NTPServerList, i, szOKs);
+            }
+            i++;
+        }
+        selectedListId = -1;
+        EnableWindow(updateButton, TRUE);
+        /*EndDialog(hDlg, LOWORD(wParam));*/
+        return (INT_PTR)TRUE;
+        
+    }
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
@@ -432,7 +509,7 @@ INT_PTR CALLBACK Edit(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         }
         else if (LOWORD(wParam) == IDOK)
         {
-            SetWindowText(hDlg, L"请等候5秒，正在获取信息....");
+            SetWindowText(hDlg, szWaitTitle);
             char servername[256] = {};
             WCHAR dlgItem[256] = {};
             Edit_GetText(GetDlgItem(hDlg, IDC_SERVER), dlgItem, 256);
@@ -480,7 +557,7 @@ INT_PTR CALLBACK Add(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         }
         else if (LOWORD(wParam) == IDOK)
         {
-            SetWindowText(hDlg, L"请等候5秒，正在获取信息....");
+            SetWindowText(hDlg, szWaitTitle);
             char servername[256] = {};
             WCHAR dlgItem[256] = {};
             Edit_GetText(GetDlgItem(hDlg,IDC_SERVER),dlgItem,256);

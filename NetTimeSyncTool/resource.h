@@ -24,6 +24,11 @@
 #define IDS_EDIT                        116
 #define IDS_UPDATE                      117
 #define IDS_SETTIME                     118
+#define IDS_ADDTIP                      119
+#define IDS_ADDTIPTITLE                 120
+#define IDS_DELETETIP                   121
+#define IDS_DELETETIPTITLE              122
+#define IDS_WAIT                        123
 #define IDR_MAINFRAME                   128
 #define IDD_ADDDIALOG                   132
 #define IDD_ADDDIALOG1                  133
