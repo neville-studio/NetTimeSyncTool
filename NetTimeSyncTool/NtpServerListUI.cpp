@@ -17,7 +17,7 @@ HWND CreateNTPServerList(HINSTANCE hInst, HWND hWnd)
         WS_CHILD | WS_CLIPCHILDREN |
         WS_BORDER |
         WS_VISIBLE |
-        
+         LVS_SINGLESEL|
         LVS_REPORT ;
 
     hwndListView = CreateWindowEx(LVS_EX_DOUBLEBUFFER ,  // ex style
@@ -29,7 +29,7 @@ HWND CreateNTPServerList(HINSTANCE hInst, HWND hWnd)
         600,                             // width
         250,                             // height
         hWnd,                            // parent
-        (HMENU)10,                       // ID
+        (HMENU)110,                       // ID
         hInst,                           // instance
         NULL);                           // no extra data
     ListView_SetExtendedListViewStyleEx(hwndListView, LVS_EX_DOUBLEBUFFER, LVS_EX_DOUBLEBUFFER);    // This code is to enable ListView's Double 

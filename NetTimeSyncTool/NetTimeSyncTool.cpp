@@ -14,7 +14,7 @@
 #include "GlobalNTPResultData.h"
 #include <comdef.h>
 #define MAX_LOADSTRING 100
-#define IDT_UPDATETIMER 1001
+#define IDT_UPDATETIMER 1002
 #pragma comment(linker,"\"/manifestdependency:type='win32' \
 name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
 processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
@@ -35,6 +35,8 @@ WCHAR szUpdate[MAX_LOADSTRING];            // Add tip title String
 WCHAR szDELETE[MAX_LOADSTRING];                 // DELETE String
 WCHAR szDELETETip[MAX_LOADSTRING];                 // ADD Tip String
 WCHAR szDELETETipTitle[MAX_LOADSTRING];            // Add tip title String
+WCHAR szprivillageTip[MAX_LOADSTRING];                 // ADD Tip String
+WCHAR szprivillageTipTitle[MAX_LOADSTRING];            // Add tip title String
 WCHAR szWaitTitle[MAX_LOADSTRING];            // Add tip title String
 WCHAR szSetTime[MAX_LOADSTRING];            // Add tip title String
 static HWND NTPServerList;
@@ -81,6 +83,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     LoadStringW(hInstance, IDS_WAIT, szWaitTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDS_UPDATE, szUpdate, MAX_LOADSTRING);
     LoadStringW(hInstance, IDS_SETTIME, szSetTime, MAX_LOADSTRING);
+    LoadStringW(hInstance, IDS_REQUIREPRIVILLAGE, szprivillageTip, MAX_LOADSTRING);
+    LoadStringW(hInstance, IDS_REQUIREPRIVILLAGETIP, szprivillageTipTitle, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
     globalFont = CreateFont(-16/*高*/, -8/*宽*/, 0, 0, 400 /*400表示正常字体*/,
         FALSE/*斜体?*/, FALSE/*下划线?*/, FALSE/*删除线?*/, DEFAULT_CHARSET,
@@ -100,7 +104,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // Main message loop:
     while (GetMessage(&msg, nullptr, 0, 0))
     {
-        if(!IsDialogMessage(msg.hwnd,&msg))
+        if (IsDialogMessage(msg.hwnd, &msg)) {}else
         //if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
         {
             TranslateMessage(&msg);
@@ -213,39 +217,40 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_CREATE:
     {
+        
         SendMessage(hWnd, WM_SETFONT, (WPARAM)globalFont, NULL);
         HWND systemTime = CreateWindowEx(WS_EX_TRANSPARENT,L"static", szSYSTEMTIME, WS_CHILD  | WS_VISIBLE  | SS_LEFT ,
             50 /*X坐标*/, 10, 125, 25,
             hWnd,		 //父窗口句柄
-            (HMENU)1,	 //为控件指定一个唯一标识符
+            NULL,	 //为控件指定一个唯一标识符
             hInst,		 //当前程序实例句柄
             NULL);
         SendMessage(systemTime, WM_SETFONT, (WPARAM)globalFont, NULL);
         sysTime = CreateWindowEx(WS_EX_TRANSPARENT  ,L"static", L"", WS_CHILD | WS_VISIBLE | SS_LEFT | WS_CLIPCHILDREN,
             175 /*X坐标*/, 10, 300, 25,
             hWnd,		 //父窗口句柄
-            (HMENU)1,	 //为控件指定一个唯一标识符
+            NULL,	 //为控件指定一个唯一标识符
             hInst,		 //当前程序实例句柄
             NULL);
         SendMessage(sysTime, WM_SETFONT, (WPARAM)globalFont, NULL);
         HWND bootTime = CreateWindowEx(WS_EX_TRANSPARENT, L"static", szBOOTTIMESTRING, WS_CHILD | WS_VISIBLE | SS_LEFT,
             50 /*X坐标*/, 40, 125, 25,
             hWnd,		 //父窗口句柄
-            (HMENU)1,	 //为控件指定一个唯一标识符
+            NULL,	 //为控件指定一个唯一标识符
             hInst,		 //当前程序实例句柄
             NULL);
         SendMessage(bootTime, WM_SETFONT, (WPARAM)globalFont, NULL);
         boot = CreateWindowEx(WS_EX_TRANSPARENT , L"static", L"", WS_CHILD | WS_VISIBLE | SS_LEFT | WS_CLIPCHILDREN,
             175 /*X坐标*/, 40, 125, 25,
             hWnd,		 //父窗口句柄
-            (HMENU)1,	 //为控件指定一个唯一标识符
+            NULL,	 //为控件指定一个唯一标识符
             hInst,		 //当前程序实例句柄
             NULL);
         SendMessage(boot, WM_SETFONT, (WPARAM)globalFont, NULL);
         HWND netTime = CreateWindowEx(WS_EX_TRANSPARENT, L"static", szNETWORKTIMESTRING, WS_CHILD | WS_VISIBLE | SS_LEFT,
             50 /*X坐标*/, 70, 125, 25,
             hWnd,		 //父窗口句柄
-            (HMENU)1,	 //为控件指定一个唯一标识符
+            NULL,	 //为控件指定一个唯一标识符
             hInst,		 //当前程序实例句柄
             NULL);
         SendMessage(netTime, WM_SETFONT, (WPARAM)globalFont, NULL);
@@ -258,42 +263,57 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         addButton = CreateWindow(
             L"BUTTON",  // Predefined class; Unicode assumed 
             szADD,      // Button text 
-            WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
+            WS_TABSTOP | WS_VISIBLE | BS_PUSHBUTTON | WS_CHILD ,  // Styles 
             50,         // x position 
             360,         // y position 
             100,        // Button width
             30,        // Button height
             hWnd,     // Parent window
-            (HMENU)12,       // No menu.
-            (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE),
+            NULL,       // No menu.
+            hInst,
             NULL);      // Pointer not needed.
         SendMessage(addButton, WM_SETFONT, (WPARAM)globalFont, NULL);
         editButton = CreateWindow(
             L"BUTTON",  // Predefined class; Unicode assumed 
             szEDIT,      // Button text 
-            WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
+            WS_TABSTOP | WS_VISIBLE | BS_PUSHBUTTON | WS_CHILD ,  // Styles 
             160,         // x position 
             360,         // y position 
             100,        // Button width
             30,        // Button height
             hWnd,     // Parent window
-            (HMENU)13,       // No menu.
-            (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE),
+            NULL,       // No menu.
+           hInst,
             NULL);      // Pointer not needed.
         SendMessage(editButton, WM_SETFONT, (WPARAM)globalFont, NULL);
         deleteButton = CreateWindow(
             L"BUTTON",  // Predefined class; Unicode assumed 
             szDELETE,      // Button text 
-            WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
+            WS_TABSTOP | WS_VISIBLE | BS_PUSHBUTTON | WS_CHILD ,  // Styles 
             270,         // x position 
             360,         // y position 
             100,        // Button width
             30,        // Button height
             hWnd,     // Parent window
-            (HMENU)14,       // No menu.
-            (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE),
+           NULL,       // No menu.
+            hInst,
             NULL);      // Pointer not needed.
         SendMessage(deleteButton, WM_SETFONT, (WPARAM)globalFont, NULL);
+        
+        updateButton = CreateWindow(
+            L"BUTTON",  // Predefined class; Unicode assumed 
+            szUpdate,      // Button text 
+            WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON  ,  // Styles 
+            400,         // x position 
+            360,         // y position 
+            100,        // Button width
+            30,        // Button height
+            hWnd,     // Parent window
+            NULL,       // No menu.
+            hInst,
+            NULL);      // Pointer not needed.
+        SendMessage(updateButton, WM_SETFONT, (WPARAM)globalFont, NULL);
+        
         setTimeButton = CreateWindow(
             L"BUTTON",  // Predefined class; Unicode assumed 
             szSetTime,      // Button text 
@@ -303,25 +323,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             100,        // Button width
             30,        // Button height
             hWnd,     // Parent window
-            (HMENU)15,       // No menu.
-            (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE),
+           NULL,       // No menu.
+            hInst,
             NULL);      // Pointer not needed.
         SendMessage(setTimeButton, WM_SETFONT, (WPARAM)globalFont, NULL);
-        updateButton = CreateWindow(
-            L"BUTTON",  // Predefined class; Unicode assumed 
-            szUpdate,      // Button text 
-            WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
-            400,         // x position 
-            360,         // y position 
-            100,        // Button width
-            30,        // Button height
-            hWnd,     // Parent window
-            (HMENU)16,       // No menu.
-            (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE),
-            NULL);      // Pointer not needed.
-        SendMessage(updateButton, WM_SETFONT, (WPARAM)globalFont, NULL);
-        
-
         /*ListView_*/
         NTPServerList = CreateNTPServerList(hInst, hWnd);
         
@@ -349,6 +354,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         */
     }   
     break;
+    case DM_GETDEFID:
+    {
+        //if (wParam == VK_TAB)
+        //{
+        //    //HWND cur = GetFocus();
+        //    HWND next = GetNextDlgTabItem(hWnd, NULL, FALSE);
+        //    SetFocus(next);
+        //    //SendMessage(hWnd, WM_KILLFOCUS, (WPARAM)cur, NULL);
+        //}
+            
+
+    }
+    case DM_SETDEFID: {
+        break;
+    }
     case WM_ERASEBKGND:
     {
         if ((WPARAM)NTPServerList == wParam || hWnd == NTPServerList)
@@ -379,12 +399,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         return (INT_PTR)hbrBkgnd;
     }
         break;
-    case WM_KEYUP:
+    /*case WM_KEYUP:
         if (wParam == VK_TAB)
         {
             SetFocus(GetNextWindow(GetFocus(), GW_HWNDNEXT));
 
-        }
+        }*/
     case WM_COMMAND:
         {
             //int wmId = LOWORD(wParam);
@@ -426,11 +446,59 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 DWORD currentThreadId = GetCurrentThreadId();
                 CreateThread(NULL, 0, resync,&currentThreadId, 0, NULL);
             }
-            else{
+            else if(lParam ==(LPARAM)setTimeButton){
+                if (selectedListId < 0)return FALSE;
+                //HANDLE currentProcess;
+                //LUID timeluid;
+                ///*wchar_t hh[32];
+                //wcscpy(hh, SE_SYSTEMTIME_NAME);*/
+                //HANDLE hProcess = GetCurrentProcess();
+                //if (!OpenProcessToken(hProcess,  TOKEN_ADJUST_PRIVILEGES |
+                //    TOKEN_QUERY | TOKEN_READ, &currentProcess)) return FALSE;
+                //int rreess = LookupPrivilegeValue(NULL, SE_SYSTEMTIME_NAME, &timeluid);
+                //PRIVILEGE_SET currentPrivillege = {};
+                //currentPrivillege.PrivilegeCount = 1;
+                //currentPrivillege.Control = PRIVILEGE_SET_ALL_NECESSARY;
+                //currentPrivillege.Privilege[0].Luid = timeluid;
+                //currentPrivillege.Privilege[0].Attributes = SE_PRIVILEGE_ENABLED_BY_DEFAULT;
+                //BOOL hres;
+
+                //int rr = PrivilegeCheck(currentProcess, &currentPrivillege, &hres);
+                //if (rr == 0)
+                //    rr = GetLastError();
+                unsigned long long nowt1 = GetTickCount64();
+                unsigned long long updateTimeStamp = (nowt1 - ntpServers.globalData[selectedListId].updateTime) * 10000 + ntpServers.globalData[selectedListId].timeStamp;
+                std::wstring systemTimeStr;
+                FILETIME filetime;
+                filetime.dwLowDateTime = updateTimeStamp & 0xffffffff;
+                filetime.dwHighDateTime = updateTimeStamp >> 32;
+                SYSTEMTIME systimess = {};
+                FileTimeToSystemTime(&filetime, &systimess);
+                BOOL hres = SetSystemTime(&systimess);
+                if (hres)
+                {
+                    
+                }
+                else
+                {
+                    
+                    MessageBox(hWnd, szprivillageTip, szprivillageTipTitle,MB_OK);
+                }
+            }
+            else {
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }
         }
         break;
+    case WM_TIMECHANGE:
+    {
+        KillTimer(hWnd, IDT_UPDATETIMER);
+        SetTimer(hWnd,                  // handle to main window 
+            IDT_UPDATETIMER,            // timer identifier 
+            10,                         // 10-second interval 
+            (TIMERPROC)NULL);           // no timer callback
+        break;
+    }
     case WM_NOTIFY:
     {
         LPNMHDR  lpnmh = (LPNMHDR)lParam;
@@ -471,7 +539,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             case IDT_UPDATETIMER: 
             {
-                if (OKSync) { SendMessage(hWnd, WM_USER + 1, NULL, NULL); OKSync = false; }
+                if (OKSync) { SendMessage(hWnd, WM_USER + 2, NULL, NULL); OKSync = false; }
                 // process the 10-second timer 
                 FILETIME fileTime;
                 GetSystemTimeAsFileTime(&fileTime);
@@ -499,7 +567,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     return 0;
             }
         }
-    case WM_USER + 1:
+    
+    case WM_USER + 2:
     {
 
         char servername[256] = {};

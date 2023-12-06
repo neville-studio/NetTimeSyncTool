@@ -29,6 +29,8 @@
 #define IDS_DELETETIP                   121
 #define IDS_DELETETIPTITLE              122
 #define IDS_WAIT                        123
+#define IDS_REQUIREPRIVILLAGE           124
+#define IDS_REQUIREPRIVILLAGETIP        125
 #define IDR_MAINFRAME                   128
 #define IDD_ADDDIALOG                   132
 #define IDD_ADDDIALOG1                  133
