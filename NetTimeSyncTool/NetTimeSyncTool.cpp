@@ -36,6 +36,7 @@ WCHAR szDELETE[MAX_LOADSTRING];                 // DELETE String
 WCHAR szDELETETip[MAX_LOADSTRING];                 // ADD Tip String
 WCHAR szDELETETipTitle[MAX_LOADSTRING];            // Add tip title String
 WCHAR szWaitTitle[MAX_LOADSTRING];            // Add tip title String
+WCHAR szSetTime[MAX_LOADSTRING];            // Add tip title String
 static HWND NTPServerList;
 static int selectedListId = -1;
 
@@ -59,6 +60,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(lpCmdLine);
 
     // TODO: Place code here.
+ /*   PDYNAMIC_TIME_ZONE_INFORMATION pTimeZoneInformation = {};
+    GetDynamicTimeZoneInformation(pTimeZoneInformation);*/
 
     // Initialize global strings
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -77,6 +80,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     LoadStringW(hInstance, IDS_DELETETIPTITLE, szDELETETipTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDS_WAIT, szWaitTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDS_UPDATE, szUpdate, MAX_LOADSTRING);
+    LoadStringW(hInstance, IDS_SETTIME, szSetTime, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
     globalFont = CreateFont(-16/*高*/, -8/*宽*/, 0, 0, 400 /*400表示正常字体*/,
         FALSE/*斜体?*/, FALSE/*下划线?*/, FALSE/*删除线?*/, DEFAULT_CHARSET,
@@ -96,7 +100,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // Main message loop:
     while (GetMessage(&msg, nullptr, 0, 0))
     {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+        if(!IsDialogMessage(msg.hwnd,&msg))
+        //if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
@@ -199,7 +204,7 @@ DWORD WINAPI resync(LPVOID lparam)
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static HBRUSH hBrush;
-    static HWND sysTime, boot,addButton,deleteButton,editButton,updateButton;
+    static HWND sysTime, boot,addButton,deleteButton,editButton,updateButton,setTimeButton;
     static HBRUSH  hbrBkgnd;
     
     static NTPResult ntp1;
@@ -289,6 +294,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE),
             NULL);      // Pointer not needed.
         SendMessage(deleteButton, WM_SETFONT, (WPARAM)globalFont, NULL);
+        setTimeButton = CreateWindow(
+            L"BUTTON",  // Predefined class; Unicode assumed 
+            szSetTime,      // Button text 
+            WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
+            510,         // x position 
+            360,         // y position 
+            100,        // Button width
+            30,        // Button height
+            hWnd,     // Parent window
+            (HMENU)15,       // No menu.
+            (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE),
+            NULL);      // Pointer not needed.
+        SendMessage(setTimeButton, WM_SETFONT, (WPARAM)globalFont, NULL);
         updateButton = CreateWindow(
             L"BUTTON",  // Predefined class; Unicode assumed 
             szUpdate,      // Button text 
@@ -298,11 +316,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             100,        // Button width
             30,        // Button height
             hWnd,     // Parent window
-            (HMENU)14,       // No menu.
+            (HMENU)16,       // No menu.
             (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE),
             NULL);      // Pointer not needed.
         SendMessage(updateButton, WM_SETFONT, (WPARAM)globalFont, NULL);
-
+        
 
         /*ListView_*/
         NTPServerList = CreateNTPServerList(hInst, hWnd);
@@ -333,15 +351,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     break;
     case WM_ERASEBKGND:
     {
-        if ((WPARAM)NTPServerList == wParam||hWnd==NTPServerList)
+        if ((WPARAM)NTPServerList == wParam || hWnd == NTPServerList)
+        {
             OutputDebugString(L"ERASING\n");
             return TRUE;
+        }
 
         return DefWindowProc(hWnd, WM_ERASEBKGND, wParam, lParam);
     }
     case WM_CTLCOLORSTATIC:
     {
-        //if ((HWND)lParam == boot || (HWND)lParam == sysTime) {
+        if ((HWND)lParam == boot || (HWND)lParam == sysTime) {
             HDC hdcStatic = (HDC)wParam;
             SetTextColor(hdcStatic, RGB(0, 0, 0));
             SetBkColor(hdcStatic, RGB(0, 0, 0));
@@ -355,10 +375,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
                 hbrBkgnd = CreateSolidBrush(RGB(255, 255, 255));
             }*/
-        //}
+        }
         return (INT_PTR)hbrBkgnd;
     }
         break;
+    case WM_KEYUP:
+        if (wParam == VK_TAB)
+        {
+            SetFocus(GetNextWindow(GetFocus(), GW_HWNDNEXT));
+
+        }
     case WM_COMMAND:
         {
             //int wmId = LOWORD(wParam);
