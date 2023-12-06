@@ -481,8 +481,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 }
                 else
                 {
-                    
+                    int err = GetLastError();
+                    if(err == 1314)
                     MessageBox(hWnd, szprivillageTip, szprivillageTipTitle,MB_OK);
+                    else {
+                        MessageBox(hWnd, L"Unknown error", L"", MB_OK);
+                    }
                 }
             }
             else {
