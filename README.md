@@ -1,8 +1,8 @@
-The Software is protected by Chinese and international copyright laws. 
+**The Software is protected by Chinese and international copyright laws.**
 
-Chinese Soft copyright registration certificate number: 2024SR0209367.
+**Chinese Soft copyright registration certificate number: 2024SR0209367.**
 
-Copyright (C) 2019-2024 Neville Studio.
+**Copyright (C) 2019-2024 Neville Studio.**
 
 This is a mini tools, which can sync your time. and view online NTP Server Time, manage your online NTP Servers.
 
