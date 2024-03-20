@@ -1,6 +1,6 @@
 **The Software is protected by Chinese and international copyright laws.**
 
-**Chinese Soft copyright registration certificate number: 2024SR0209367.**
+**Chinese Soft copyright registration certificate number: 2024SR0209367.** 中国软件著作权证号：2024SR0209367
 
 **Copyright (C) 2019-2024 Neville Studio.**
 
