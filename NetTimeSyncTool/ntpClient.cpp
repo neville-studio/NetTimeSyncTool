@@ -50,19 +50,26 @@ public:
 		*(strSource + 2) = poll;
 		*(strSource + 3) = precision;
 		for(int i = 0;i<4;i++)
-			*(strSource + 4+i) = rootDelay & (0x000000ff<<((3-i)*8));
+			*(strSource + 4+i) = (rootDelay & (0x000000ff<<((3-i)*8)))>>  ((3 - i) * 8);
 		for (int i = 0; i < 4; i++)
-			*(strSource + 8 + i) = rootDescription & 0x000000ff << ((3 - i) * 8);
+			*(strSource + 8 + i) = (rootDescription & (0x000000ff << ((3 - i) * 8)))>>  ((3 - i) * 8);
 		for (int i = 0; i < 4; i++)
-			*(strSource + 12 + i) = referenceIdentifier & 0x000000ff << ((3 - i) * 8);
+			*(strSource + 12 + i) = (referenceIdentifier & (0x000000ff << ((3 - i) * 8)))>>((3 - i) * 8);
 		for (int i = 0; i < 8; i++)
-			*(strSource + 16 + i) = referenceTimestamp & 0x00000000000000ffLL << ((7 - i) * 8);
+			*(strSource + 16 + i) = (referenceTimestamp & (0x00000000000000ffLL << ((7 - i) * 8)))>> ((7 - i) * 8);
 		for (int i = 0; i < 8; i++)
-			*(strSource + 24 + i) = originateTimestamp & 0x00000000000000ffLL << ((7 - i) * 8);
+			*(strSource + 24 + i) = (originateTimestamp & (0x00000000000000ffLL << ((7 - i) * 8))) >> ((7 - i) * 8);
 		for (int i = 0; i < 8; i++)
-			*(strSource + 32 + i) = receiveTimestamp & 0x00000000000000ffLL << ((7 - i) * 8);
+			*(strSource + 32 + i) = (receiveTimestamp & (0x00000000000000ffLL << ((7 - i) * 8))) >> ((7 - i) * 8);
+        FILETIME ft;
+        GetSystemTimePreciseAsFileTime(&ft);
+        unsigned long long highTime = ft.dwHighDateTime;
+        unsigned long long lowTime = ft.dwLowDateTime;
+        unsigned long long sec = ((highTime << 32) + lowTime - 94354848000000000ULL)/10000000;
+        unsigned long long lowsec = ((highTime << 32) + lowTime - 94354848000000000ULL) % 10000000;
+        transmitTimestamp = (sec<<32) + lowsec*100000/232;
 		for (int i = 0; i < 8; i++)
-			*(strSource + 40 + i) = transmitTimestamp & 0x00000000000000ffLL << ((7 - i) * 8);
+			*(strSource + 40 + i) = (transmitTimestamp & (0x00000000000000ffLL << ((7 - i) * 8))) >> ((7 - i) * 8);
 		return 0;
 	};
     int transLateToUDPPackage(char* result)
@@ -112,6 +119,9 @@ public:
         return 0;
         
     };
+    NTPPackage() {
+       
+    }
 };
 //wstring timeStampToSystemTime(unsigned long long timeStamp);
 //int main() {
