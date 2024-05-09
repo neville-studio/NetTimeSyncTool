@@ -14,7 +14,8 @@ env:
   BUILD_CONFIGURATION: Release
 
 permissions:
-  contents: read
+  contents: write
+  packages: write
   
 jobs:
   build:
@@ -34,20 +35,34 @@ jobs:
       - name: Build x64
         run: msbuild /p:Configuration=Release /p:Platform=x64 NetTimeSyncTool.sln
 
+      - name: Upload x64 artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: x64-artifact
+          path: ./x64/Release/NetTimeSyncTool.exe
+
       - name: Build x86
         run: msbuild /p:Configuration=Release /p:Platform=x86 NetTimeSyncTool.sln
+
+      - name: Upload x86 artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: x86-artifact
+          path: ./Release/NetTimeSyncTool.exe
 
   release:
     needs: build
     runs-on: windows-latest
 
     steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+      
       - name: Create Release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
           draft: true
