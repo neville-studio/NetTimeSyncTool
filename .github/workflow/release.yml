@@ -39,10 +39,10 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: x64 Executable
-          path: ./x64/release/NetTimeSyncTool.exe
+          path: ./x64/Release/NetTimeSyncTool.exe
 
       - name: Upload x86 Executable
         uses: actions/upload-artifact@v2
         with:
           name: x86 Executable
-          path: ./release/NetTimeSyncTool.exe
+          path: ./Release/NetTimeSyncTool.exe
