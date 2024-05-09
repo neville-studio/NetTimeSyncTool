@@ -97,7 +97,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./x64/Release/NetTimeSyncTool.exe
-          asset_name: NetTimeSyncTool-x64.exe
+          asset_name: NetTimeSyncTool-x64-windows.exe
           asset_content_type: application/octet-stream
 
       - name: Upload x86 Executable
@@ -107,5 +107,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./Release/NetTimeSyncTool.exe
-          asset_name: NetTimeSyncTool-x86.exe
+          asset_name: NetTimeSyncTool-x86-windows.exe
           asset_content_type: application/octet-stream
