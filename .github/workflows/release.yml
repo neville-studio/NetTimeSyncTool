@@ -1,3 +1,15 @@
+# MIT License
+# Copyright (c) 2021-2024, Neville Studio.
+# 
+# (for China)软件著作权登记证号：2024SR0209367
+# 
+# Thanks Github Copilot for the help with this file!
+# 感谢 Github Copilot 帮助我编写这个文件！
+# This file helps github to build and release the NetTimeSyncTool. The executable will no longer 
+# be built locally, but on Github.
+# 这个文件帮助 Github 编译和发布 NetTimeSyncTool。可执行文件将不再在本地构建，而是在 Github 上构建。
+
+
 name: Release
 
 on:
@@ -64,18 +76,26 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          release_name: NetTimeSyncTool-${{ github.ref }}
           draft: true
           prerelease: false
 
       - name: Upload x64 Executable
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: x64 Executable
-          path: ./x64/Release/NetTimeSyncTool.exe
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./x64/Release/NetTimeSyncTool.exe
+          asset_name: NetTimeSyncTool-x64.exe
+          asset_content_type: application/octet-stream
 
       - name: Upload x86 Executable
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: x86 Executable
-          path: ./Release/NetTimeSyncTool.exe
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./Release/NetTimeSyncTool.exe
+          asset_name: NetTimeSyncTool-x86.exe
+          asset_content_type: application/octet-stream
