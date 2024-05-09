@@ -67,8 +67,17 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - name: Download artifacts
+      - name: Download x64 artifact
         uses: actions/download-artifact@v2
+        with:
+          name: x64-artifact
+          path: ./x64/Release/
+
+      - name: Download x86 artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: x86-artifact
+          path: ./Release/
       
       - name: Create Release
         id: create_release
