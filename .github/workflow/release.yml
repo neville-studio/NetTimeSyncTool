@@ -1,0 +1,48 @@
+name: Release
+
+on:
+  create:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.0.0
+
+      - name: Build x64
+        run: msbuild /p:Configuration=Release /p:Platform=x64 NetTimeSyncTool.sln
+
+      - name: Build x86
+        run: msbuild /p:Configuration=Release /p:Platform=x86 NetTimeSyncTool.sln
+
+  release:
+    needs: build
+    runs-on: windows-latest
+
+    steps:
+      - name: Create Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: true
+          prerelease: false
+
+      - name: Upload x64 Executable
+        uses: actions/upload-artifact@v2
+        with:
+          name: x64 Executable
+          path: ./x64/release/NetTimeSyncTool.exe
+
+      - name: Upload x86 Executable
+        uses: actions/upload-artifact@v2
+        with:
+          name: x86 Executable
+          path: ./release/NetTimeSyncTool.exe
