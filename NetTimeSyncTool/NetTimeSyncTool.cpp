@@ -17,7 +17,7 @@
 #define IDT_UPDATETIMER 1002
 #pragma comment(linker,"\"/manifestdependency:type='win32' \
 name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
-processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
+processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"") 
 // Global Variables:
 HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
@@ -49,10 +49,11 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    Add(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK    Edit(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
-
+int autoUpdate();
 HFONT globalFont;
 GlobalData ntpServers;
 bool OKSync = false;
+DWORD WINAPI resync(LPVOID lparam);
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
@@ -60,7 +61,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
-
+    
     // TODO: Place code here.
  /*   PDYNAMIC_TIME_ZONE_INFORMATION pTimeZoneInformation = {};
     GetDynamicTimeZoneInformation(pTimeZoneInformation);*/
@@ -92,6 +93,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         FF_DONTCARE, TEXT("Microsoft Yahei")
     );
     // Perform application initialization:
+    if (!wcscmp(lpCmdLine, L"autosync"))
+    {
+        OKSync = false;
+        bool setTimeError = autoUpdate();
+        if (setTimeError!=0)
+            MessageBox(NULL, L"FAILED", L"FAILED", MB_ICONWARNING);
+        else
+            MessageBox(NULL, L"Successed", L"Successed", MB_ICONWARNING);
+        PostQuitMessage(0);
+        return 0;
+    }
     if (!InitInstance (hInstance, nCmdShow))
     {
         return FALSE;
@@ -99,6 +111,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_NETTIMESYNCTOOL));
 
+    
     MSG msg;
 
     // Main message loop:
@@ -345,6 +358,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 setItemStatus(NTPServerList, i, szOKs);
             }*/
         }
+        EnableWindow(setTimeButton, FALSE);
+
         EnableWindow(updateButton, FALSE);
         DWORD currentThreadId = GetCurrentThreadId();
         CreateThread(NULL, 0, resync, &currentThreadId, 0, NULL);
@@ -356,14 +371,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     break;
     case DM_GETDEFID:
     {
-        //if (wParam == VK_TAB)
-        //{
-        //    //HWND cur = GetFocus();
-        //    HWND next = GetNextDlgTabItem(hWnd, NULL, FALSE);
-        //    SetFocus(next);
-        //    //SendMessage(hWnd, WM_KILLFOCUS, (WPARAM)cur, NULL);
-        //}
-            
+               
 
     }
     case DM_SETDEFID: {
@@ -373,7 +381,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         if ((WPARAM)NTPServerList == wParam || hWnd == NTPServerList)
         {
-            OutputDebugString(L"ERASING\n");
+            
             return TRUE;
         }
 
@@ -448,24 +456,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
             else if(lParam ==(LPARAM)setTimeButton){
                 if (selectedListId < 0)return FALSE;
-                //HANDLE currentProcess;
-                //LUID timeluid;
-                ///*wchar_t hh[32];
-                //wcscpy(hh, SE_SYSTEMTIME_NAME);*/
-                //HANDLE hProcess = GetCurrentProcess();
-                //if (!OpenProcessToken(hProcess,  TOKEN_ADJUST_PRIVILEGES |
-                //    TOKEN_QUERY | TOKEN_READ, &currentProcess)) return FALSE;
-                //int rreess = LookupPrivilegeValue(NULL, SE_SYSTEMTIME_NAME, &timeluid);
-                //PRIVILEGE_SET currentPrivillege = {};
-                //currentPrivillege.PrivilegeCount = 1;
-                //currentPrivillege.Control = PRIVILEGE_SET_ALL_NECESSARY;
-                //currentPrivillege.Privilege[0].Luid = timeluid;
-                //currentPrivillege.Privilege[0].Attributes = SE_PRIVILEGE_ENABLED_BY_DEFAULT;
-                //BOOL hres;
-
-                //int rr = PrivilegeCheck(currentProcess, &currentPrivillege, &hres);
-                //if (rr == 0)
-                //    rr = GetLastError();
                 unsigned long long nowt1 = GetTickCount64();
                 unsigned long long updateTimeStamp = (nowt1 - ntpServers.globalData[selectedListId].updateTime) * 10000 + ntpServers.globalData[selectedListId].timeStamp;
                 std::wstring systemTimeStr;
@@ -475,11 +465,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 SYSTEMTIME systimess = {};
                 FileTimeToSystemTime(&filetime, &systimess);
                 BOOL hres = SetSystemTime(&systimess);
-                if (hres)
-                {
-                    
-                }
-                else
+                if (!hres)
                 {
                     int err = GetLastError();
                     if(err == 1314)
@@ -599,6 +585,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         selectedListId = -1;
         EnableWindow(updateButton, TRUE);
+        EnableWindow(setTimeButton, TRUE);
         /*EndDialog(hDlg, LOWORD(wParam));*/
         return (INT_PTR)TRUE;
         
@@ -721,4 +708,49 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     }
     return (INT_PTR)FALSE;
+}
+
+int autoUpdate() {
+    for (int i = 0; i < ntpServers.servers.size(); i++)
+    {
+        NTPResult ntp;
+        ntp.serverName = _bstr_t(ntpServers.servers[i].c_str());
+        ntpServers.globalData.push_back(ntp);
+        //InsertNTPViewItem(NTPServerList, ntpServers.globalData[i]);
+
+        /*if (baseServerResult) {
+            setItemStatus(NTPServerList, i, szERRORs);
+        }
+        else {
+            setItemStatus(NTPServerList, i, szOKs);
+        }*/
+    }
+    OKSync = false;
+    resync(NULL);
+    if(!OKSync)
+        return -1;
+    //if (selectedListId < 0)return FALSE;
+    int i = 0;
+    for (NTPResult ntp : ntpServers.globalData)
+    {
+        if (!ntp.status)
+            break;
+        i++;
+    }
+    if (i >= ntpServers.globalData.size())return -1;
+    unsigned long long nowt1 = GetTickCount64();
+    unsigned long long updateTimeStamp = (nowt1 - ntpServers.globalData[i].updateTime) * 10000 + ntpServers.globalData[i].timeStamp;
+    std::wstring systemTimeStr;
+    FILETIME filetime;
+    filetime.dwLowDateTime = updateTimeStamp & 0xffffffff;
+    filetime.dwHighDateTime = updateTimeStamp >> 32;
+    SYSTEMTIME systimess = {};
+    FileTimeToSystemTime(&filetime, &systimess);
+    BOOL hres = SetSystemTime(&systimess);
+    if (!hres)
+    {
+        int err = GetLastError();
+        return err;
+    }
+    return 0;
 }
