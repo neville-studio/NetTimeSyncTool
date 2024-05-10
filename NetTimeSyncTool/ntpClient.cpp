@@ -23,7 +23,7 @@ using namespace std;
 #pragma comment(lib, "Ws2_32.lib")
 #define RECEIVER_ADDRESS "127.0.0.1"
 //#define PORT 123
-const unsigned int epoch = 0;
+
 wstring pluszero(int s);
 unsigned long long NTPtoUTCTimeStamp(unsigned long long ntpTimeStamp);
 wstring transmitfromFileTime(FILETIME fileTime);

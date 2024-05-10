@@ -20,6 +20,7 @@
 #define IDS_OK                          112
 #define IDS_ERROR                       113
 #define IDS_ADD                         114
+#define VERSIOn                         114
 #define IDS_DELETE                      115
 #define IDS_EDIT                        116
 #define IDS_UPDATE                      117
@@ -34,7 +35,6 @@
 #define IDR_MAINFRAME                   128
 #define IDD_ADDDIALOG                   132
 #define IDD_ADDDIALOG1                  133
-#define IDR_VERSION2                    133
 #define IDC_EDIT1                       1000
 #define IDC_SERVER                      1001
 #define ID_ACCELERATOR32772             32772

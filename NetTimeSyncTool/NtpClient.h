@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 using namespace std;
-
+const unsigned int epoch = 0;
 class NTPResult {
 public:
 	wstring fromIP;

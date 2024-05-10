@@ -457,7 +457,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             else if(lParam ==(LPARAM)setTimeButton){
                 if (selectedListId < 0)return FALSE;
                 unsigned long long nowt1 = GetTickCount64();
-                unsigned long long updateTimeStamp = (nowt1 - ntpServers.globalData[selectedListId].updateTime) * 10000 + ntpServers.globalData[selectedListId].timeStamp;
+                int flag = 0;
+                unsigned long long timestemp = ntpServers.globalData[selectedListId].updateTime;
+                if (timestemp >= 0x80000000ULL)flag = 1;
+                unsigned long long updateTimeStamp = (nowt1 - (timestemp + (epoch+flag) * 0x100000000)) * 10000 + ntpServers.globalData[selectedListId].timeStamp;
                 std::wstring systemTimeStr;
                 FILETIME filetime;
                 filetime.dwLowDateTime = updateTimeStamp & 0xffffffff;
