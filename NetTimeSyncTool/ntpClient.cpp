@@ -23,7 +23,7 @@ using namespace std;
 #pragma comment(lib, "Ws2_32.lib")
 #define RECEIVER_ADDRESS "127.0.0.1"
 //#define PORT 123
-
+const unsigned int epoch = 0;
 wstring pluszero(int s);
 unsigned long long NTPtoUTCTimeStamp(unsigned long long ntpTimeStamp);
 wstring transmitfromFileTime(FILETIME fileTime);
@@ -43,6 +43,8 @@ public:
 	unsigned long long originateTimestamp=0;
 	unsigned long long receiveTimestamp=0;
 	unsigned long long transmitTimestamp=0;
+    // As of NTP version 4 defination, we added epoch variable. If the Seconds variable is larger than the Others, we will added it.
+    // unsigned int epoch = 0;
 
 	int returnPackageData(char* strSource) {
 		*strSource = leap << 6 | versionNumber << 3 | mode;
@@ -68,6 +70,7 @@ public:
         unsigned long long sec = ((highTime << 32) + lowTime - 94354848000000000ULL)/10000000;
         unsigned long long lowsec = ((highTime << 32) + lowTime - 94354848000000000ULL) % 10000000;
         transmitTimestamp = (sec<<32) + lowsec*100000/232;
+        
 		for (int i = 0; i < 8; i++)
 			*(strSource + 40 + i) = (transmitTimestamp & (0x00000000000000ffLL << ((7 - i) * 8))) >> ((7 - i) * 8);
 		return 0;
@@ -115,6 +118,10 @@ public:
         for (int i = 40; i < 48; i++)
         {
             transmitTimestamp = transmitTimestamp | (((unsigned long long) * (result + i)) & 0xff)  << ((47 - i) * 8);
+        }
+        if (max(originateTimestamp >> 32, receiveTimestamp >> 32) - min(originateTimestamp >> 32, receiveTimestamp >> 32) & 0x80000000) // epoch function.
+        {
+            
         }
         return 0;
         
@@ -286,6 +293,7 @@ int getNTPTime(char * ntpServerName, NTPResult &NTPres)
             //wstring s = timeStampToSystemTime(ntpTransmit.receiveTimestamp);
             /*FILETIME t1 = { NTPtoUTCTimeStamp(ntpTransmit.receiveTimestamp)>>32, NTPtoUTCTimeStamp(ntpTransmit.receiveTimestamp) &&0xffffffff };
             FILETIME t2 = { NTPtoUTCTimeStamp(ntpTransmit.transmitTimestamp) >> 32, NTPtoUTCTimeStamp(ntpTransmit.transmitTimestamp) && 0xffffffff };*/
+            /*ntpTransmit.epoch = */
             unsigned long long t1 = ((unsigned long long)startFileTime.dwHighDateTime << 32) + ((unsigned long long)startFileTime.dwLowDateTime & 0xffffffff);
             unsigned long long t2 = ((unsigned long long)endFileTime.dwHighDateTime << 32) + ((unsigned long long)endFileTime.dwLowDateTime & 0xffffffff);
             unsigned long long currentTimeStamp = (t2 - t1 + NTPtoUTCTimeStamp(ntpTransmit.transmitTimestamp) - NTPtoUTCTimeStamp(ntpTransmit.receiveTimestamp)) / 2ULL + NTPtoUTCTimeStamp(ntpTransmit.transmitTimestamp);
@@ -381,7 +389,9 @@ wstring NTPResult::plusdualzero(int s) {
     else return to_wstring(s);
 }
 unsigned long long NTPtoUTCTimeStamp(unsigned long long ntpTimeStamp) {
-    return ((ntpTimeStamp & 0xffffffff00000000ULL) >> 32) * 10000000 + 94354848000000000ULL + (ntpTimeStamp & 0xffffffff) * 232 / 100000;//116444736000000000L - 2208988800* 10000000 ;
+    int flag = 0;
+    if (ntpTimeStamp < 0x80000000) flag = 1;
+    return ((ntpTimeStamp & 0xffffffff00000000ULL) >> 32) * 10000000 + 94354848000000000ULL + (ntpTimeStamp & 0xffffffff) * 232 / 100000 + flag * 0x100000000*10000000;//116444736000000000L - 2208988800* 10000000 ;
 }
 wstring transmitToIP(unsigned int ip) {
     return to_wstring((ip & 0xff000000) >> 24) + L"." + to_wstring((ip & 0x00ff0000) >> 16) + L"." + to_wstring((ip & 0x0000ff00) >> 8) + L"." + to_wstring((ip & 0x000000ff));
