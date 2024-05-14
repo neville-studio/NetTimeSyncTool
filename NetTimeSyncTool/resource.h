@@ -20,7 +20,6 @@
 #define IDS_OK                          112
 #define IDS_ERROR                       113
 #define IDS_ADD                         114
-#define VERSIOn                         114
 #define IDS_DELETE                      115
 #define IDS_EDIT                        116
 #define IDS_UPDATE                      117
@@ -32,7 +31,10 @@
 #define IDS_WAIT                        123
 #define IDS_REQUIREPRIVILLAGE           124
 #define IDS_REQUIREPRIVILLAGETIP        125
+#define IDS_UPDATEERROR                 126
+#define IDS_UPDATESUCCESS               127
 #define IDR_MAINFRAME                   128
+#define IDS_UNKNOWN                     128
 #define IDD_ADDDIALOG                   132
 #define IDD_ADDDIALOG1                  133
 #define IDC_EDIT1                       1000

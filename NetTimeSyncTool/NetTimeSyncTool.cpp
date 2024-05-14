@@ -39,6 +39,9 @@ WCHAR szprivillageTip[MAX_LOADSTRING];                 // ADD Tip String
 WCHAR szprivillageTipTitle[MAX_LOADSTRING];            // Add tip title String
 WCHAR szWaitTitle[MAX_LOADSTRING];            // Add tip title String
 WCHAR szSetTime[MAX_LOADSTRING];            // Add tip title String
+WCHAR szUpdateSuccessful[MAX_LOADSTRING];            // Add tip title String
+WCHAR szUpdateFailed[MAX_LOADSTRING];            // Add tip title String
+WCHAR szUnknownError[MAX_LOADSTRING];            // Add tip title String
 static HWND NTPServerList;
 static int selectedListId = -1;
 
@@ -86,6 +89,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     LoadStringW(hInstance, IDS_SETTIME, szSetTime, MAX_LOADSTRING);
     LoadStringW(hInstance, IDS_REQUIREPRIVILLAGE, szprivillageTip, MAX_LOADSTRING);
     LoadStringW(hInstance, IDS_REQUIREPRIVILLAGETIP, szprivillageTipTitle, MAX_LOADSTRING);
+    LoadStringW(hInstance, IDS_UPDATEERROR, szUpdateFailed, MAX_LOADSTRING);
+    LoadStringW(hInstance, IDS_UPDATESUCCESS, szUpdateSuccessful, MAX_LOADSTRING);
+    LoadStringW(hInstance, IDS_UNKNOWN, szUnknownError, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
     globalFont = CreateFont(-16/*高*/, -8/*宽*/, 0, 0, 400 /*400表示正常字体*/,
         FALSE/*斜体?*/, FALSE/*下划线?*/, FALSE/*删除线?*/, DEFAULT_CHARSET,
@@ -98,11 +104,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         OKSync = false;
         bool setTimeError = autoUpdate();
         if (setTimeError!=0)
-            MessageBox(NULL, L"FAILED", L"FAILED", MB_ICONWARNING);
+            MessageBox(NULL, szUpdateFailed, szUpdateFailed, MB_ICONWARNING);
         else
-            MessageBox(NULL, L"Successed", L"Successed", MB_ICONWARNING);
+            MessageBox(NULL, szUpdateSuccessful, szUpdateSuccessful, MB_ICONWARNING);
         PostQuitMessage(0);
         return 0;
+    }
+    else if (!wcscmp(lpCmdLine, L"autosync /nowarn")) {
+        OKSync = false;
+        int setTimeError = autoUpdate();
+        PostQuitMessage(setTimeError);
+        return setTimeError;
     }
     if (!InitInstance (hInstance, nCmdShow))
     {
@@ -193,6 +205,10 @@ DWORD WINAPI resync(LPVOID lparam)
         size_t convertChar = 256;
         wcstombs_s(&convertChar, servername, dlgItem, 256);
         int baseServerResult = getNTPTime(servername, ntpServers.globalData[i]);
+        if (!lparam && !ntpServers.globalData[i].status) { 
+            OKSync = true;
+            return 0; 
+        }
         //InsertNTPViewItem(NTPServerList, ntpServers.globalData[i]);
         /*if (baseServerResult) {
             setItemStatus(NTPServerList, i, szERRORs);
@@ -474,7 +490,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     if(err == 1314)
                     MessageBox(hWnd, szprivillageTip, szprivillageTipTitle,MB_OK);
                     else {
-                        MessageBox(hWnd, L"Unknown error", L"", MB_OK);
+                        MessageBox(hWnd,szUnknownError, szUnknownError, MB_OK);
                     }
                 }
             }
