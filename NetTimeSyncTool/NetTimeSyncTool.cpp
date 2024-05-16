@@ -447,13 +447,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 DialogBox(hInst, MAKEINTRESOURCE(IDD_ADDDIALOG), hWnd, Add);
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }
-            else if (lParam == (LPARAM)editButton && ListView_GetSelectedCount(NTPServerList))
+            else if (lParam == (LPARAM)editButton && ListView_GetSelectionMark(NTPServerList) > -1)
             {
+                selectedListId = ListView_GetSelectionMark(NTPServerList);
                 DialogBox(hInst, MAKEINTRESOURCE(IDD_ADDDIALOG), hWnd, Edit);
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }
-            else if (lParam == (LPARAM)deleteButton && ListView_GetSelectedCount(NTPServerList)) {
-                
+            else if (lParam == (LPARAM)deleteButton && ListView_GetSelectionMark(NTPServerList) > -1) {
+                selectedListId = ListView_GetSelectionMark(NTPServerList);
                 int okDelete = MessageBox(hWnd, szDELETETip, szDELETETipTitle, MB_OKCANCEL);
                 if (okDelete == IDOK) {
                     /*LV_ITEM item;
@@ -579,7 +580,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     
     case WM_USER + 2:
     {
-
+        EnableWindow(updateButton, FALSE);
+        EnableWindow(setTimeButton, FALSE);
+        EnableWindow(editButton, FALSE);
+        EnableWindow(deleteButton, FALSE);
         char servername[256] = {};
         WCHAR dlgItem[256] = {};
         size_t convertChar = 256;
@@ -605,6 +609,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         selectedListId = -1;
         EnableWindow(updateButton, TRUE);
         EnableWindow(setTimeButton, TRUE);
+        EnableWindow(editButton, TRUE);
+        EnableWindow(deleteButton, TRUE);
         /*EndDialog(hDlg, LOWORD(wParam));*/
         return (INT_PTR)TRUE;
         
