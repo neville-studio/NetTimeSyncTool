@@ -276,24 +276,7 @@ int getNTPTime(char * ntpServerName, NTPResult &NTPres)
             //printf("\n");
             NTPPackage ntpTransmit;
             ntpTransmit.transLateToUDPPackage(recvbuf);
-       /*     printf("leap : %d\n", ntpTransmit.leap);
-            printf("VersionNumber: %d\n", ntpTransmit.versionNumber);
-            printf("mode: %d\n", ntpTransmit.mode);
-            printf("statum: %d\n", ntpTransmit.statum);
-            printf("poll: %d\n", ntpTransmit.poll);
-            printf("precision: %u\n", ntpTransmit.precision);
-            printf("rootDelay:%u\n", ntpTransmit.rootDelay);
-            printf("rootDescription:%u\n", ntpTransmit.rootDescription);
-            printf("referenceIdentifier:%u\n", ntpTransmit.referenceIdentifier);
-            printf("referenceTimestamp: %llu\n", ntpTransmit.receiveTimestamp);
-            printf("originateTimestamp: %llu\n", ntpTransmit.originateTimestamp);
-            printf("receiveTimestamp: %llu\n", ntpTransmit.receiveTimestamp);
-            printf("transmitTimestamp: %llu\n", ntpTransmit.transmitTimestamp);*/
-            //time_t now;
-            //wstring s = timeStampToSystemTime(ntpTransmit.receiveTimestamp);
-            /*FILETIME t1 = { NTPtoUTCTimeStamp(ntpTransmit.receiveTimestamp)>>32, NTPtoUTCTimeStamp(ntpTransmit.receiveTimestamp) &&0xffffffff };
-            FILETIME t2 = { NTPtoUTCTimeStamp(ntpTransmit.transmitTimestamp) >> 32, NTPtoUTCTimeStamp(ntpTransmit.transmitTimestamp) && 0xffffffff };*/
-            /*ntpTransmit.epoch = */
+
             unsigned long long t1 = ((unsigned long long)startFileTime.dwHighDateTime << 32) + ((unsigned long long)startFileTime.dwLowDateTime & 0xffffffff);
             unsigned long long t2 = ((unsigned long long)endFileTime.dwHighDateTime << 32) + ((unsigned long long)endFileTime.dwLowDateTime & 0xffffffff);
             unsigned long long currentTimeStamp = (t2 - t1 + NTPtoUTCTimeStamp(ntpTransmit.transmitTimestamp) - NTPtoUTCTimeStamp(ntpTransmit.receiveTimestamp)) / 2ULL + NTPtoUTCTimeStamp(ntpTransmit.transmitTimestamp);
@@ -390,7 +373,7 @@ wstring NTPResult::plusdualzero(int s) {
 }
 unsigned long long NTPtoUTCTimeStamp(unsigned long long ntpTimeStamp) {
     int flag = 0;
-    if (ntpTimeStamp < 0x80000000) flag = 1;
+    if (((ntpTimeStamp & 0xffffffff00000000ULL) >> 32) < 0x80000000) flag = 1;
     return ((ntpTimeStamp & 0xffffffff00000000ULL) >> 32) * 10000000 + 94354848000000000ULL + (ntpTimeStamp & 0xffffffff) * 232 / 100000 + flag * 0x100000000*10000000;//116444736000000000L - 2208988800* 10000000 ;
 }
 wstring transmitToIP(unsigned int ip) {
