@@ -64,7 +64,7 @@ public:
 		for (int i = 0; i < 8; i++)
 			*(strSource + 32 + i) = (receiveTimestamp & (0x00000000000000ffLL << ((7 - i) * 8))) >> ((7 - i) * 8);
         FILETIME ft;
-        GetSystemTimePreciseAsFileTime(&ft);
+        GetSystemTimeAsFileTime(&ft);
         unsigned long long highTime = ft.dwHighDateTime;
         unsigned long long lowTime = ft.dwLowDateTime;
         unsigned long long sec = ((highTime << 32) + lowTime - 94354848000000000ULL)/10000000;
