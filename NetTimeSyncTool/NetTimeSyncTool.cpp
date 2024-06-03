@@ -477,7 +477,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 int flag = 0;
                 unsigned long long timestemp = ntpServers.globalData[selectedListId].updateTime;
                 unsigned long long servertimestamp = ntpServers.globalData[selectedListId].timeStamp;
-                unsigned long long updateTimeStamp = (nowt1 - timestemp) + servertimestamp;
+                unsigned long long updateTimeStamp = (nowt1 - timestemp)*10000 + servertimestamp;
                 std::wstring systemTimeStr;
                 FILETIME filetime;
                 filetime.dwLowDateTime = updateTimeStamp & 0xffffffff;
