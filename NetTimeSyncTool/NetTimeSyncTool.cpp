@@ -98,6 +98,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         OUT_CHARACTER_PRECIS, CLIP_CHARACTER_PRECIS, DEFAULT_QUALITY,
         FF_DONTCARE, TEXT("Microsoft Yahei")
     );
+    int x;
+    x = 0;
     // Perform application initialization:
     if (!wcscmp(lpCmdLine, L"autosync"))
     {
