@@ -185,7 +185,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // Store instance handle in our global variable
 
-   HWND hWnd = CreateWindowExW(NULL,szWindowClass, szTitle, (WS_OVERLAPPEDWINDOW ^ WS_SIZEBOX ^ WS_MAXIMIZE ^ WS_MAXIMIZEBOX),
+   HWND hWnd = CreateWindowExW(NULL,szWindowClass, szTitle, (WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS |WS_CLIPCHILDREN ^ WS_SIZEBOX ^ WS_MAXIMIZE ^ WS_MAXIMIZEBOX),
       CW_USEDEFAULT, 0, 750, 500, nullptr, nullptr, hInstance, nullptr);
    
    if (!hWnd)
@@ -257,7 +257,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             hInst,		 //当前程序实例句柄
             NULL);
         SendMessage(systemTime, WM_SETFONT, (WPARAM)globalFont, NULL);
-        sysTime = CreateWindowEx(WS_EX_TRANSPARENT  ,L"static", L"", WS_CHILD | WS_VISIBLE | SS_LEFT | WS_CLIPCHILDREN,
+        sysTime = CreateWindowEx(WS_EX_TRANSPARENT  ,L"static", L"", WS_CHILD | WS_VISIBLE | SS_LEFT | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
             175 /*X坐标*/, 10, 300, 25,
             hWnd,		 //父窗口句柄
             NULL,	 //为控件指定一个唯一标识符
@@ -271,7 +271,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             hInst,		 //当前程序实例句柄
             NULL);
         SendMessage(bootTime, WM_SETFONT, (WPARAM)globalFont, NULL);
-        boot = CreateWindowEx(WS_EX_TRANSPARENT , L"static", L"", WS_CHILD | WS_VISIBLE | SS_LEFT | WS_CLIPCHILDREN,
+        boot = CreateWindowEx(WS_EX_TRANSPARENT , L"static", L"", WS_CHILD | WS_VISIBLE | SS_LEFT | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
             175 /*X坐标*/, 40, 125, 25,
             hWnd,		 //父窗口句柄
             NULL,	 //为控件指定一个唯一标识符
