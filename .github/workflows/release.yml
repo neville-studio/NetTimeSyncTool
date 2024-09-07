@@ -48,7 +48,7 @@ jobs:
         run: msbuild /p:Configuration=Release /p:Platform=x64 NetTimeSyncTool.sln
 
       - name: Upload x64 artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: x64-artifact
           path: ./x64/Release/NetTimeSyncTool.exe
@@ -57,7 +57,7 @@ jobs:
         run: msbuild /p:Configuration=Release /p:Platform=x86 NetTimeSyncTool.sln
 
       - name: Upload x86 artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: x86-artifact
           path: ./Release/NetTimeSyncTool.exe
