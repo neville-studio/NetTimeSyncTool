@@ -10,7 +10,7 @@ You can download the source code to correct them.
 
 To run This tool, your computer must have installed latest Microsoft Visual C++ 2022 Redistributable.
 
-This reposity is builted by Microsoft Visual Studio 2022.
+This reposity is built by Microsoft Visual Studio 2022.
 
 OS Requirements: Windows 11、Windows 10、Windows Server 2022、Windows Server 2019、Windows Server 2016、Windows Server 2012 R2、Windows Server 2012、Windows Server 2008 R2 SP1、Windows 7 SP1、Windows 8.1、Windows 8、Windows Vista SP2
 
