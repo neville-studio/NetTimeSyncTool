@@ -71,13 +71,13 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: x64-artifact
-          path: ./x64/Release/
+          path: ${{ github.workspace }}/x64/Release/
 
       - name: Download x86 artifact
         uses: actions/download-artifact@v2
         with:
           name: x86-artifact
-          path: ./Release/
+          path: ${{ github.workspace }}/Release/
       
       - name: Create Release
         id: create_release
