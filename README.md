@@ -16,7 +16,7 @@ OS Requirements: Windows 11、Windows 10、Windows Server 2022、Windows Server 
 
 **本软件受到中国和国际版权法保护**
 
-（For China） 中国软件著作权证号：2024SR02093671
+（For China） 中国软件著作权证号：2024SR0209367
 
 **版权所有 2019-2024 Neville Studio**
 
