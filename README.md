@@ -12,7 +12,7 @@ To run This tool, your computer must have installed latest Microsoft Visual C++ 
 
 This reposity is built by Microsoft Visual Studio 2022.
 
-OS Requirements: Windows 11、Windows 10、Windows Server 2022、Windows Server 2019、Windows Server 2016、Windows Server 2012 R2、Windows Server 2012、Windows Server 2008 R2 SP1、Windows 7 SP1、Windows 8.1、Windows 8、Windows Vista SP2
+OS Requirements: Windows 11、Windows 10、Windows Server 2022、Windows Server 2019、Windows Server 2016、Windows Server 2012 R2、Windows Server 2012、Windows Server 2008 R2 SP1、Windows Server 2008 SP2、Windows 7 SP1、Windows 8.1、Windows 8、Windows Vista SP2
 
 **本软件受到中国和国际版权法保护**
 
@@ -30,4 +30,4 @@ OS Requirements: Windows 11、Windows 10、Windows Server 2022、Windows Server 
 
 此软件基于Microsoft Visual Studio 2022构建
 
-操作系统要求：Windows 11、Windows 10、Windows Server 2022、Windows Server 2019、Windows Server 2016、Windows Server 2012 R2、Windows Server 2012、Windows Server 2008 R2 SP1、Windows 7 SP1、Windows 8.1、Windows 8、Windows Vista SP2
+操作系统要求：Windows 11、Windows 10、Windows Server 2022、Windows Server 2019、Windows Server 2016、Windows Server 2012 R2、Windows Server 2012、Windows Server 2008 R2 SP1、Windows Server 2008 SP2、Windows 7 SP1、Windows 8.1、Windows 8、Windows Vista SP2
