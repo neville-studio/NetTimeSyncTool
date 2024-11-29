@@ -1,4 +1,9 @@
 
+/*
+ * @Author: Neville Studio <2840772674@qq.com>
+ * @Date: 2024-11-29 22:31:00
+ * @Function: NTP logics(socket).
+ */
 #define WIN32_LEAN_AND_MEAN
 #include "NtpClient.h"
 #include <windows.h>

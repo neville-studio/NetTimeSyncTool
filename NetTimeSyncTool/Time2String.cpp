@@ -1,3 +1,8 @@
+/*
+ * @Author: Neville Studio <2840772674@qq.com>
+ * @Date: 2024-11-29 22:27:06
+ * @Function: to convert time to string, include time stamp and file time.
+ */
 #include <string>
 #include <Windows.h>
 //#include <iostream>

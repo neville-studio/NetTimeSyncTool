@@ -1,3 +1,8 @@
+///*
+// @Author: Neville Studio <2840772674@qq.com>
+// @Date : 2024-11-29 22:30:42
+// @Function : Main Form logics.
+//
 // NetTimeSyncTool.cpp : Defines the entry point for the application.
 //
 

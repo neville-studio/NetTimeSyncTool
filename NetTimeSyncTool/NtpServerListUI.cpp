@@ -1,3 +1,8 @@
+/*
+ * @Author: Neville Studio <2840772674@qq.com>
+ * @Date: 2024-11-29 22:27:06
+ * @Function: NTP list logics.
+ */
 #include <Windows.h>
 #include <CommCtrl.h>
 #include "NtpServerListUI.h"

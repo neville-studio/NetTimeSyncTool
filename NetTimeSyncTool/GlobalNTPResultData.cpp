@@ -1,3 +1,11 @@
+/*
+ * @Author: Neville Studio <2840772674@qq.com>
+ * @Date: 2024-11-29 22:29:42
+ * @Function: Storage logics.
+ */
+
+
+
 #include "GlobalNTPResultData.h"
 #include <iostream>
 #include <fstream>
