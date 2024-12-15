@@ -27,12 +27,15 @@ using namespace std;
 #define DEFAULT_PORT "123"
 #pragma comment(lib, "Ws2_32.lib")
 #define RECEIVER_ADDRESS "127.0.0.1"
+#define RECEIVER_ADDRESS_IPV6 "::1"
 //#define PORT 123
 
 wstring pluszero(int s);
 unsigned long long NTPtoUTCTimeStamp(unsigned long long ntpTimeStamp);
 wstring transmitfromFileTime(FILETIME fileTime);
 wstring transmitToIP(unsigned int ip);
+wstring ConvertToASCII(unsigned int sourcename);
+wstring transmitToIPV6(unsigned int ip);
 class NTPPackage {
 public:
 	unsigned char leap = 0;
@@ -135,37 +138,23 @@ public:
        
     }
 };
-//wstring timeStampToSystemTime(unsigned long long timeStamp);
-//int main() {
-//
-//	NTPPackage ntpbase = NTPPackage();
-//	ntpbase.versionNumber = 4;
-//	char ntpPackage[49] = {};
-//	int result = ntpbase.returnPackageData(ntpPackage);
-//	WSAData wsadata;
-//	SOCKET sendSocket;
-//	SOCKADDR_IN receiverAddr;
-//	int addrLength = 0;
-//	int sendBufLength = 1024;
-//	int ret = 0;
-//
-//	WSAStartup(MAKEWORD(2, 2), &wsadata);
-//	sendSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-//	if (SOCKET_ERROR == sendSocket) {
-//		printf("Create Socket Error!");
-//		goto exit;
-//	}
-//	
-//
-//
-//	
-//exit:
-//	closesocket(sendSocket);
-//	
-//	return 0;
-//}
 
-int getNTPTime(char * ntpServerName, NTPResult &NTPres)
+int getNTPTime(char* ntpServerName, NTPResult& NTPres) {
+    int result = getNTPTime(ntpServerName, NTPres, 4);
+	if (result >= 0)
+	{
+		return result;
+	}
+    result = getNTPTime(ntpServerName, NTPres, 6);
+    if (result >= 0)
+    {
+        return result;
+    }
+    return result;
+}
+
+
+int getNTPTime(char * ntpServerName, NTPResult &NTPres, int IPversion)
 {
     WSADATA wsaData;
     SOCKET ConnectSocket = INVALID_SOCKET;
@@ -197,8 +186,13 @@ int getNTPTime(char * ntpServerName, NTPResult &NTPres)
     }
 
     ZeroMemory(&hints, sizeof(hints));
-    hints.ai_family = AF_UNSPEC;
+	if (IPversion == 6)
+		hints.ai_family = AF_INET6;
+	else
+		hints.ai_family = AF_INET;
+    //hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_DGRAM;
+    //hints.ai_protocol = IPPROTO_IPV4;
     hints.ai_protocol = IPPROTO_UDP;
 
     // Resolve the server address and port
@@ -266,94 +260,71 @@ int getNTPTime(char * ntpServerName, NTPResult &NTPres)
 
     // Receive until the peer closes the connection
     //do {
-    
-        iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
-        if (iResult > 0) {
+    iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+    if (iResult > 0) {
 
 
-            FILETIME endFileTime = {};
-            GetSystemTimeAsFileTime(&endFileTime);
-            //printf("Bytes received: %d\n", iResult);
-            ///* for (int i = 0; i < 48; i++)
-            // {
-            //     printf("%x ", *(recvbuf + i));
-            // }*/
-            //printf("\n");
-            NTPPackage ntpTransmit;
-            ntpTransmit.transLateToUDPPackage(recvbuf);
+        FILETIME endFileTime = {};
+        GetSystemTimeAsFileTime(&endFileTime);
+        //printf("Bytes received: %d\n", iResult);
+        ///* for (int i = 0; i < 48; i++)
+        // {
+        //     printf("%x ", *(recvbuf + i));
+        // }*/
+        //printf("\n");
+        NTPPackage ntpTransmit;
+        ntpTransmit.transLateToUDPPackage(recvbuf);
 
-            unsigned long long t1 = ((unsigned long long)startFileTime.dwHighDateTime << 32) + ((unsigned long long)startFileTime.dwLowDateTime & 0xffffffff);
-            unsigned long long t2 = ((unsigned long long)endFileTime.dwHighDateTime << 32) + ((unsigned long long)endFileTime.dwLowDateTime & 0xffffffff);
-            unsigned long long currentTimeStamp = (t2 - t1 + NTPtoUTCTimeStamp(ntpTransmit.transmitTimestamp) - NTPtoUTCTimeStamp(ntpTransmit.receiveTimestamp)) / 2ULL + NTPtoUTCTimeStamp(ntpTransmit.transmitTimestamp);
-            FILETIME currentTime = { }; 
-            currentTime.dwHighDateTime = currentTimeStamp >> 32;
-            //cout << currentTime.dwHighDateTime << endl;
-            currentTime.dwLowDateTime = currentTimeStamp & 0xffffffff;
-            
-            
-            /*cout << currentTimeStamp<<" "<<endFileTime.dwHighDateTime<<" "<<t2 << " " << t1 << " " << endl;
-            cout << "From IP: " << transmitToIP(ntpTransmit.referenceIdentifier)<<endl;
-            cout << "Final Time: " << transmitfromFileTime(currentTime) << endl;*/
+        unsigned long long t1 = ((unsigned long long)startFileTime.dwHighDateTime << 32) + ((unsigned long long)startFileTime.dwLowDateTime & 0xffffffff);
+        unsigned long long t2 = ((unsigned long long)endFileTime.dwHighDateTime << 32) + ((unsigned long long)endFileTime.dwLowDateTime & 0xffffffff);
+        unsigned long long currentTimeStamp = (t2 - t1 + NTPtoUTCTimeStamp(ntpTransmit.transmitTimestamp) - NTPtoUTCTimeStamp(ntpTransmit.receiveTimestamp)) / 2ULL + NTPtoUTCTimeStamp(ntpTransmit.transmitTimestamp);
+        FILETIME currentTime = { }; 
+        currentTime.dwHighDateTime = currentTimeStamp >> 32;
+        //cout << currentTime.dwHighDateTime << endl;
+        currentTime.dwLowDateTime = currentTimeStamp & 0xffffffff;
+   
            
-            NTPres.leap = ntpTransmit.leap;
-            NTPres.versionNumber = ntpTransmit.versionNumber;
-            NTPres.fromIP = transmitToIP(ntpTransmit.referenceIdentifier);
-            NTPres.updateTime = GetTickCount64();
-            NTPres.timeStamp = currentTimeStamp;
-            NTPres.status = 0;
-            
-            //time(&now);
-            //printf("time:%lld", now);
-
-
+        NTPres.leap = ntpTransmit.leap;
+        NTPres.versionNumber = ntpTransmit.versionNumber;
+        if (ntpTransmit.statum > 1) {
+            if (IPversion == 4)
+                NTPres.fromIP = transmitToIP(ntpTransmit.referenceIdentifier);
+            else
+                NTPres.fromIP = transmitToIPV6(ntpTransmit.referenceIdentifier);
         }
-        else if (iResult == 0)
-        {
-            printf("Connection closed\n");
-            closesocket(ConnectSocket);
-            WSACleanup();
-            NTPres.status = -12;
-            return 1;
+        else {
+            NTPres.fromIP = ConvertToASCII(ntpTransmit.referenceIdentifier);
         }
-        else
-        {
-            printf("recv failed with error: %d\n", WSAGetLastError());
-            
-            NTPres.status = WSAGetLastError();
-            closesocket(ConnectSocket);
-            WSACleanup();
-            return iResult;
-        }
+        NTPres.updateTime = GetTickCount64();
+        NTPres.timeStamp = currentTimeStamp;
+        NTPres.status = 0;
+    }
+    else if (iResult == 0)
+    {
+        closesocket(ConnectSocket);
+        WSACleanup();
+        NTPres.status = -12;
+        return 1;
+    }
+    else
+    {
+        NTPres.status = WSAGetLastError();
+        closesocket(ConnectSocket);
+        WSACleanup();
+        return iResult;
+    }
 
     //} while (iResult > 0);
 
     // cleanup
     closesocket(ConnectSocket);
     WSACleanup();
-
     return 0;
 }
 
 wstring plusdualzero(int s);
 
-//wstring timeStampToSystemTime(unsigned long long timeStamp)
-//{
-//    FILETIME fileTime = {};
-//    FILETIME localFileTime = {};
-//    unsigned long long utcTimeStamp = NTPtoUTCTimeStamp(timeStamp);
-//    //unsigned long long utcTimeStamp = ((timeStamp & 0xffffffff00000000) >> 32) * 10000000 + 94354848000000000 + (timeStamp & 0xffffffff) * 232 / 100000;//116444736000000000L - 2208988800* 10000000 ;
-//    fileTime.dwHighDateTime = (utcTimeStamp & 0xffffffff00000000)>>32;
-//    fileTime.dwLowDateTime = (utcTimeStamp & 0xffffffff);
-//    cout <<endl<<utcTimeStamp<<" " << fileTime.dwHighDateTime << " " << fileTime.dwLowDateTime << endl;
-//    SYSTEMTIME systemTime = {};
-//    FileTimeToLocalFileTime(&fileTime, &localFileTime);
-//    int rrr = FileTimeToSystemTime(&localFileTime, &systemTime);
-//    cout << rrr<<endl;
-//    return to_wstring(systemTime.wYear) + "/" + to_wstring(systemTime.wMonth) + "/" + to_wstring(systemTime.wDay) 
-//        +" " + to_wstring(systemTime.wHour) + ":" + pluszero(systemTime.wMinute) + ":" + pluszero(systemTime.wSecond)
-//        +"." + plusdualzero(systemTime.wMilliseconds);
-//
-//}
+
 wstring transmitfromFileTime(FILETIME fileTime) {
     SYSTEMTIME systemTime = {};
     FILETIME localFileTime = {};
@@ -383,6 +354,17 @@ unsigned long long NTPtoUTCTimeStamp(unsigned long long ntpTimeStamp) {
 }
 wstring transmitToIP(unsigned int ip) {
     return to_wstring((ip & 0xff000000) >> 24) + L"." + to_wstring((ip & 0x00ff0000) >> 16) + L"." + to_wstring((ip & 0x0000ff00) >> 8) + L"." + to_wstring((ip & 0x000000ff));
+}
+wstring transmitToIPV6(unsigned int ip) {
+    return L"["+to_wstring((ip & 0xff000000) >> 24) + L":" + to_wstring((ip & 0x00ff0000) >> 16) + L":" + to_wstring((ip & 0x0000ff00) >> 8) + L":" + to_wstring((ip & 0x000000ff))+L":...]";
+}
+wstring ConvertToASCII(unsigned int sourcename) {
+    wstring result;
+    result += static_cast<wchar_t>((sourcename & 0xFF000000) >> 24);
+    result += static_cast<wchar_t>((sourcename & 0x00FF0000) >> 16);
+    result += static_cast<wchar_t>((sourcename & 0x0000FF00) >> 8);
+    result += static_cast<wchar_t>(sourcename & 0x000000FF);
+    return result;
 }
 
 wstring NTPResult::getTime() {

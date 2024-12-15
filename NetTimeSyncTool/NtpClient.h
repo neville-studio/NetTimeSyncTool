@@ -18,3 +18,4 @@ public:
 	
 };
 int getNTPTime(char* ntpServerName, NTPResult& NTPres);
+int getNTPTime(char* ntpServerName, NTPResult& NTPres, int IPversion);
