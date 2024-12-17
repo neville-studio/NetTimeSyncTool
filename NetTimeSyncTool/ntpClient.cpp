@@ -13,9 +13,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
+#include <sstream>
+#include <iomanip>
 #include <string>
 #include <comdef.h>
-
+//#include <fmt/format.h>
 #include<time.h>
 // Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib
 #pragma comment (lib, "Ws2_32.lib")
@@ -141,12 +143,12 @@ public:
 
 int getNTPTime(char* ntpServerName, NTPResult& NTPres) {
     int result = getNTPTime(ntpServerName, NTPres, 4);
-	if (result >= 0)
+	if (result >= 0 && NTPres.status != -1)
 	{
 		return result;
 	}
     result = getNTPTime(ntpServerName, NTPres, 6);
-    if (result >= 0)
+    if (result >= 0 && NTPres.status != -1)
     {
         return result;
     }
@@ -356,7 +358,17 @@ wstring transmitToIP(unsigned int ip) {
     return to_wstring((ip & 0xff000000) >> 24) + L"." + to_wstring((ip & 0x00ff0000) >> 16) + L"." + to_wstring((ip & 0x0000ff00) >> 8) + L"." + to_wstring((ip & 0x000000ff));
 }
 wstring transmitToIPV6(unsigned int ip) {
-    return L"["+to_wstring((ip & 0xff000000) >> 24) + L":" + to_wstring((ip & 0x00ff0000) >> 16) + L":" + to_wstring((ip & 0x0000ff00) >> 8) + L":" + to_wstring((ip & 0x000000ff))+L":...]";
+    std::wstringstream wss;
+    wss << L"["; // Start of IPv6 address
+    wss << std::hex << std::setw(4) << std::setfill(L'0') << ((ip & 0xFF000000) >> 24);
+    wss << L":";
+    wss << std::hex << std::setw(4) << std::setfill(L'0') << ((ip & 0x00FF0000) >> 16);
+    wss << L":...]"; // End of IPv6 address
+    return wss.str();
+
+	//return result;
+    //return fmt::format("{:#x}", );
+    //return L"["+to_wstring((ip & 0xff000000) >> 24) + L":" + to_wstring((ip & 0x00ff0000) >> 16) + L":" + to_wstring((ip & 0x0000ff00) >> 8) + L":" + to_wstring((ip & 0x000000ff))+L":...]";
 }
 wstring ConvertToASCII(unsigned int sourcename) {
     wstring result;

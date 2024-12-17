@@ -136,7 +136,7 @@ BOOL setNTPItem(HWND hWndListView, int num, NTPResult res)
     item.iItem = num;
     item.iSubItem = 0;
     WCHAR serverName[256];
-    WCHAR serverIP[16] = L"";
+    WCHAR serverIP[40] = L"";
     wcscpy_s(serverName, res.serverName.size() + 1, res.serverName.c_str());
     //OutputDebugString(to_wstring(NTPitem.fromIP.size()).c_str());
     wcscpy_s(serverIP, res.fromIP.size() + 1, res.fromIP.c_str());
