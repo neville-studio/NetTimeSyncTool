@@ -13,8 +13,8 @@ This reposity is built by Microsoft Visual Studio 2022.
 
 OS Requirements: Windows 11、Windows 10、Windows Server 2022、Windows Server 2019、Windows Server 2016、Windows Server 2012 R2、Windows Server 2012、Windows Server 2008 R2 SP1、Windows Server 2008 SP2、Windows 7 SP1、Windows 8.1、Windows 8、Windows Vista SP2
 # Support Plan
-Feature Update: at least until Jan. 12, 2027, when Windows Server 2016 ends of its life.
-Security Update && Bug Fix: at least until 2036, when first epoch of NTP ends
+- **Feature Update**: at least until Jan. 12, 2027, when Windows Server 2016 ends of its life.
+- **Security Update && Bug Fix**: at least until 2036, when first epoch of NTP ends
 
 # Copyright
 **The Software is protected by Chinese and international copyright laws.**
@@ -35,8 +35,8 @@ We use MIT License to allow you to using this code. see [license](./LICENSE)
 操作系统要求：Windows 11、Windows 10、Windows Server 2022、Windows Server 2019、Windows Server 2016、Windows Server 2012 R2、Windows Server 2012、Windows Server 2008 R2 SP1、Windows Server 2008 SP2、Windows 7 SP1、Windows 8.1、Windows 8、Windows Vista SP2
 
 # 项目支持计划
-功能性更新：至少到2027年1月12日，也就是Windows Server 2016结束支持的时间
-安全更新和Bug修复：至少到2036年，第一轮NTP时钟结束。
+- **功能性更新**：至少到2027年1月12日，也就是Windows Server 2016结束支持的时间
+- **安全更新和Bug修复**：至少到2036年，第一轮NTP时钟结束时。
 
 # 版权信息
 **本软件受到中国和国际版权法保护**
@@ -45,4 +45,4 @@ We use MIT License to allow you to using this code. see [license](./LICENSE)
 
 **版权所有 2019-2024 Neville Studio**
 
-我们使用MIT License许可您使用此软件代码。详情请查看
+我们使用MIT License许可您使用此软件代码。详情请查看[这里](./LICENSE)
