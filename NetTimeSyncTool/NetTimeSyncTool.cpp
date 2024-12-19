@@ -98,10 +98,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     LoadStringW(hInstance, IDS_UPDATESUCCESS, szUpdateSuccessful, MAX_LOADSTRING);
     LoadStringW(hInstance, IDS_UNKNOWN, szUnknownError, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
-    globalFont = CreateFont(-16/*高*/, -8/*宽*/, 0, 0, 400 /*400表示正常字体*/,
+    globalFont = CreateFont(-16/*高*/, 0/*宽*/, 0, 0, 400 /*400表示正常字体*/,
         FALSE/*斜体?*/, FALSE/*下划线?*/, FALSE/*删除线?*/, DEFAULT_CHARSET,
         OUT_CHARACTER_PRECIS, CLIP_CHARACTER_PRECIS, DEFAULT_QUALITY,
-        FF_DONTCARE, TEXT("Microsoft Yahei")
+        FF_DONTCARE, TEXT("Segoe UI")
     );
     int x;
     x = 0;
@@ -160,7 +160,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
     wcex.cbSize = sizeof(WNDCLASSEX);
 
-    wcex.style          = NULL;// CS_HREDRAW | CS_VREDRAW;
+    wcex.style          =  CS_HREDRAW | CS_VREDRAW;
     wcex.lpfnWndProc    = WndProc;
     wcex.cbClsExtra     = 0;
     wcex.cbWndExtra     = 0;
@@ -190,7 +190,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // Store instance handle in our global variable
 
-   HWND hWnd = CreateWindowExW(NULL,szWindowClass, szTitle, ((WS_OVERLAPPEDWINDOW ^ WS_SIZEBOX ^ WS_MAXIMIZE ^ WS_MAXIMIZEBOX )| WS_CLIPSIBLINGS |WS_CLIPCHILDREN ),
+   HWND hWnd = CreateWindowExW(WS_EX_COMPOSITED,szWindowClass, szTitle, ((WS_OVERLAPPEDWINDOW ^ WS_SIZEBOX ^ WS_MAXIMIZE ^ WS_MAXIMIZEBOX )| WS_CLIPSIBLINGS |WS_CLIPCHILDREN ),
       CW_USEDEFAULT, 0, 750, 500, nullptr, nullptr, hInstance, nullptr);
    
    if (!hWnd)
@@ -373,13 +373,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             ntp.serverName = _bstr_t(ntpServers.servers[i].c_str());
             ntpServers.globalData.push_back(ntp);
             InsertNTPViewItem(NTPServerList, ntpServers.globalData[i]);
-
-            /*if (baseServerResult) {
-                setItemStatus(NTPServerList, i, szERRORs);
-            }
-            else {
-                setItemStatus(NTPServerList, i, szOKs);
-            }*/
         }
         EnableWindow(setTimeButton, FALSE);
 
@@ -404,7 +397,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         if ((WPARAM)NTPServerList == wParam || hWnd == NTPServerList)
         {
-            
             return TRUE;
         }
 
@@ -417,34 +409,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             SetTextColor(hdcStatic, RGB(0, 0, 0));
             SetBkColor(hdcStatic, RGB(0, 0, 0));
             SetBkMode(hdcStatic, TRANSPARENT);
-
-            /*RECT rect;
-            rect.left = 175; rect.right = 475;
-            rect.top = 10; rect.bottom = 35;
-            InvalidateRect((HWND)lParam, &rect, false);*/
-            /*if (hbrBkgnd == NULL)
-            {
-                hbrBkgnd = CreateSolidBrush(RGB(255, 255, 255));
-            }*/
         }
         return (INT_PTR)hbrBkgnd;
     }
         break;
-    /*case WM_KEYUP:
-        if (wParam == VK_TAB)
-        {
-            SetFocus(GetNextWindow(GetFocus(), GW_HWNDNEXT));
-
-        }*/
     case WM_COMMAND:
         {
-            //int wmId = LOWORD(wParam);
-            //// Parse the menu selections:
-            //switch (wmId)
-            //{
-            //default:
-            //    return DefWindowProc(hWnd, message, wParam, lParam);
-            //}
             if (lParam == (LPARAM)addButton) {
                 if (ListView_GetItemCount(NTPServerList) >= 10)
                 {
@@ -521,8 +491,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         LPNMHDR  lpnmh = (LPNMHDR)lParam;
        
         if (lpnmh->code==NM_CLICK && lpnmh->hwndFrom ==NTPServerList) {
-            /*LPNMITEMACTIVATE activeItem;
-            activeItem = (LPNMITEMACTIVATE)lParam;*/
             selectedListId = ListView_GetSelectionMark(NTPServerList);
             
         }
@@ -533,18 +501,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         
             PAINTSTRUCT ps;
             HDC hdc_old = BeginPaint(hWnd, &ps);
-            
-            HDC hdc = CreateCompatibleDC(hdc_old);
-            RECT clientRect;
-            GetClientRect(hWnd, &clientRect);
-            HBITMAP hBmp = CreateCompatibleBitmap(hdc_old, clientRect.right, clientRect.bottom);
-            SelectObject(hdc, GetSysColorBrush(COLOR_3DFACE)); //设置刷子颜色 - Rectangle()的填充色
-            BitBlt(hdc_old, 0, 0, clientRect.right, clientRect.bottom, hdc, 0, 0, SRCCOPY);
-            DeleteObject(hBmp);
+            //
+            //HDC hdc = CreateCompatibleDC(hdc_old);
+            //RECT clientRect;
+            //GetClientRect(hWnd, &clientRect);
+            //HBITMAP hBmp = CreateCompatibleBitmap(hdc_old, clientRect.right, clientRect.bottom);
+            //SelectObject(hdc, GetSysColorBrush(COLOR_3DFACE)); //设置刷子颜色 - Rectangle()的填充色
+            //BitBlt(hdc_old, 0, 0, clientRect.right, clientRect.bottom, hdc, 0, 0, SRCCOPY);
+            //DeleteObject(hBmp);
 
-            DeleteDC(hdc);
-            
-            ReleaseDC(hWnd, hdc); //释放 
+            //DeleteDC(hdc);
+            //
+            //ReleaseDC(hWnd, hdc); //释放 
             EndPaint(hWnd, &ps);
         }
         break;
@@ -557,7 +525,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             case IDT_UPDATETIMER: 
             {
                 if (OKSync) { SendMessage(hWnd, WM_USER + 2, NULL, NULL); OKSync = false; }
-                // process the 10-second timer 
                 FILETIME fileTime;
                 GetSystemTimeAsFileTime(&fileTime);
                 std::wstring systemTimeStr;
@@ -567,7 +534,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     GetWindowText(sysTime, compareTime, 64);
                     if(wcscmp(compareTime,systemTimeStr.c_str()))
                     SetWindowText(sysTime, systemTimeStr.c_str());
-                    //OutputDebugString(L"Updating...\n");
                     std::wstring bootTimeStr = TimeStamp2HMS(GetTickCount64());
                     GetWindowText(boot, compareTime, 64);
                     if (wcscmp(compareTime, bootTimeStr.c_str()))
@@ -599,9 +565,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         //NTPResult ntp;
         int i = 0;
         for (NTPResult ntp : ntpServers.globalData) {
-            //int res = getNTPTime(servername, ntp);
-            /*delete& (ntpServers.globalData[selectedListId]);*/
-            //ntpServers.globalData[selectedListId] = ntp;
             setNTPItem(NTPServerList, i, ntp);
             if (ntp.status) {
                 WCHAR error[64] = L"";
@@ -618,7 +581,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         EnableWindow(setTimeButton, TRUE);
         EnableWindow(editButton, TRUE);
         EnableWindow(deleteButton, TRUE);
-        /*EndDialog(hDlg, LOWORD(wParam));*/
         return (INT_PTR)TRUE;
         
     }
@@ -655,7 +617,7 @@ INT_PTR CALLBACK Edit(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
             NTPResult ntp;
             int res = getNTPTime(servername, ntp);
-            /*delete& (ntpServers.globalData[selectedListId]);*/
+
             ntpServers.globalData[selectedListId] = ntp;
             setNTPItem(NTPServerList,selectedListId,ntp);
             if (res) {
@@ -748,20 +710,11 @@ int autoUpdate() {
         NTPResult ntp;
         ntp.serverName = _bstr_t(ntpServers.servers[i].c_str());
         ntpServers.globalData.push_back(ntp);
-        //InsertNTPViewItem(NTPServerList, ntpServers.globalData[i]);
-
-        /*if (baseServerResult) {
-            setItemStatus(NTPServerList, i, szERRORs);
-        }
-        else {
-            setItemStatus(NTPServerList, i, szOKs);
-        }*/
     }
     OKSync = false;
     resync(NULL);
     if(!OKSync)
         return -1;
-    //if (selectedListId < 0)return FALSE;
     int i = 0;
     for (NTPResult ntp : ntpServers.globalData)
     {
