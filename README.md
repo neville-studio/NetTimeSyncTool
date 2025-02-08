@@ -19,7 +19,7 @@ OS Requirements:Windows Server 2025、Windows 11、Windows 10、Windows Server 2
 # Copyright
 **The Software is protected by Chinese and international copyright laws.**
 
-**Copyright (C) 2019-2024 Neville Studio.**
+**Copyright (C) 2019-2025 Neville Studio.**
 
 We use MIT License to allow you to using this code. see [license](./LICENSE)
 
@@ -43,6 +43,6 @@ We use MIT License to allow you to using this code. see [license](./LICENSE)
 
 （For China） 中国软件著作权证号：2024SR0209367
 
-**版权所有 2019-2024 Neville Studio**
+**版权所有 2019-2025 Neville Studio**
 
 我们使用MIT License许可您使用此软件代码。详情请查看[这里](./LICENSE)
