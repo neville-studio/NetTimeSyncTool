@@ -4,6 +4,8 @@
  * @Date: 2024-11-29 22:31:00
  * @Function: NTP logics(socket).
  */
+
+
 #define WIN32_LEAN_AND_MEAN
 #include "NtpClient.h"
 #include <windows.h>
@@ -155,7 +157,14 @@ int getNTPTime(char* ntpServerName, NTPResult& NTPres) {
     return result;
 }
 
-
+/**
+ * @brief Get the NTP Time object
+ *
+ * @param ntpServerName the remote NTP server name
+ * @param NTPres the NTP result object
+ * @param IPversion the IP version
+ * @return int the status code
+ */
 int getNTPTime(char * ntpServerName, NTPResult &NTPres, int IPversion)
 {
     WSADATA wsaData;
@@ -268,12 +277,6 @@ int getNTPTime(char * ntpServerName, NTPResult &NTPres, int IPversion)
 
         FILETIME endFileTime = {};
         GetSystemTimeAsFileTime(&endFileTime);
-        //printf("Bytes received: %d\n", iResult);
-        ///* for (int i = 0; i < 48; i++)
-        // {
-        //     printf("%x ", *(recvbuf + i));
-        // }*/
-        //printf("\n");
         NTPPackage ntpTransmit;
         ntpTransmit.transLateToUDPPackage(recvbuf);
 
@@ -352,7 +355,7 @@ wstring NTPResult::plusdualzero(int s) {
 unsigned long long NTPtoUTCTimeStamp(unsigned long long ntpTimeStamp) {
     int flag = 0;
     if (((ntpTimeStamp & 0xffffffff00000000ULL) >> 32) < 0x80000000) flag = 1;
-    return ((ntpTimeStamp & 0xffffffff00000000ULL) >> 32) * 10000000 + 94354848000000000ULL + (ntpTimeStamp & 0xffffffff) * 232 / 100000 + flag * 0x100000000*10000000;//116444736000000000L - 2208988800* 10000000 ;
+    return ((ntpTimeStamp & 0xffffffff00000000ULL) >> 32) * 10000000 + 94354848000000000ULL + (ntpTimeStamp & 0xffffffff) * 232 / 100000 + flag * 0x100000000*10000000 + epoch * 0x100000000*1000;//116444736000000000L - 2208988800* 10000000 ;
 }
 wstring transmitToIP(unsigned int ip) {
     return to_wstring((ip & 0xff000000) >> 24) + L"." + to_wstring((ip & 0x00ff0000) >> 16) + L"." + to_wstring((ip & 0x0000ff00) >> 8) + L"." + to_wstring((ip & 0x000000ff));
@@ -365,10 +368,6 @@ wstring transmitToIPV6(unsigned int ip) {
     wss << std::hex << std::setw(4) << std::setfill(L'0') << ((ip & 0x00FF0000) >> 16);
     wss << L":...]"; // End of IPv6 address
     return wss.str();
-
-	//return result;
-    //return fmt::format("{:#x}", );
-    //return L"["+to_wstring((ip & 0xff000000) >> 24) + L":" + to_wstring((ip & 0x00ff0000) >> 16) + L":" + to_wstring((ip & 0x0000ff00) >> 8) + L":" + to_wstring((ip & 0x000000ff))+L":...]";
 }
 wstring ConvertToASCII(unsigned int sourcename) {
     wstring result;
