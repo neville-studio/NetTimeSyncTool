@@ -1,4 +1,4 @@
-If you Like this Reposity, give a star. Thank you for your support.
+If you Like this Reposity, give a star. Thanks for your support.
 
 如果你喜欢这个项目，请给个Star，谢谢您的支持！
 
