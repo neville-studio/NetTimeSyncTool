@@ -1,4 +1,9 @@
-﻿If you Like this Reposity, give a star. Thanks for your support.
+﻿![Thanks Downloads](https://img.shields.io/github/downloads/neville-studio/nettimesynctool/total?style=flat-square&logo=GitHub)
+![Thanks Stars](https://img.shields.io/github/stars/neville-studio/nettimesynctool?style=flat-square&logo=GitHub)
+![Thanks Forks](https://img.shields.io/github/forks/neville-studio/nettimesynctool?style=flat-square&logo=GitHub)
+
+
+If you Like this Reposity, give a star. Thanks for your support.
 
 如果你喜欢这个项目，请给个Star，谢谢您的支持！
 
