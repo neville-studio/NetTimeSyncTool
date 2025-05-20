@@ -87,6 +87,12 @@ jobs:
         with:
           name: x86-artifact
           path: ${{ github.workspace }}/Release/
+
+      - name: Download ARM64 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ARM64-artifact
+          path: ${{ github.workspace }}/ARM64/Release/
       
       - name: Create Release
         id: create_release
