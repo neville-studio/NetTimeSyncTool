@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  xmlns:uap18="http://schemas.microsoft.com/appx/manifest/uap/windows10/18"
+  IgnorableNamespaces="uap rescap uap18">
+
+  <Identity
+    Name="69e52b93-1dc4-4adc-96f0-dd13ba8af047"
+    Publisher="CN=Neville Studio"
+    Version="1.0.5.0" />
+
+  <Properties>
+    <DisplayName>NetTimeSyncToolInstaller</DisplayName>
+    <PublisherDisplayName>Neville Studio</PublisherDisplayName>
+    <Logo>Images\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.14393.0" MaxVersionTested="10.0.14393.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="x-generate"/>
+  </Resources>
+
+  <Applications>
+    <Application Id="App"
+      Executable="$targetnametoken$.exe"
+      EntryPoint="$targetentrypoint$"  uap18:RuntimeBehavior="appSilo" uap18:TrustLevel="appContainer">
+      <uap:VisualElements
+        DisplayName="SNTP网络时钟同步器"
+        Description="这是SNTP网络时钟同步器"
+        BackgroundColor="transparent"
+        Square150x150Logo="Images\Square150x150Logo.png"
+        Square44x44Logo="Images\Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Images\Wide310x150Logo.png"  Square71x71Logo="Images\SmallTile.png" Square310x310Logo="Images\LargeTile.png"/>
+        <uap:SplashScreen Image="Images\SplashScreen.png" />
+        <uap:InitialRotationPreference>
+          <uap:Rotation Preference="landscape"/></uap:InitialRotationPreference>
+        <uap:LockScreen BadgeLogo="Images\BadgeLogo.png" Notification="badgeAndTileText"/>
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <Capability Name="internetClient" />
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+</Package>

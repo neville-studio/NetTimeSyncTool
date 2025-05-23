@@ -1,4 +1,4 @@
-///*
+ï»¿///*
 // @Author: Neville Studio <2840772674@qq.com>
 // @Date : 2024-11-29 22:30:42
 // @Function : Main Form logics.
@@ -98,8 +98,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     LoadStringW(hInstance, IDS_UPDATESUCCESS, szUpdateSuccessful, MAX_LOADSTRING);
     LoadStringW(hInstance, IDS_UNKNOWN, szUnknownError, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
-    globalFont = CreateFont(-16/*¸ß*/, 0/*¿í*/, 0, 0, 400 /*400±íÊ¾Õı³£×ÖÌå*/,
-        FALSE/*Ğ±Ìå?*/, FALSE/*ÏÂ»®Ïß?*/, FALSE/*É¾³ıÏß?*/, DEFAULT_CHARSET,
+    globalFont = CreateFont(-16/*é«˜*/, 0/*å®½*/, 0, 0, 400 /*400è¡¨ç¤ºæ­£å¸¸å­—ä½“*/,
+        FALSE/*æ–œä½“?*/, FALSE/*ä¸‹åˆ’çº¿?*/, FALSE/*åˆ é™¤çº¿?*/, DEFAULT_CHARSET,
         OUT_CHARACTER_PRECIS, CLIP_CHARACTER_PRECIS, DEFAULT_QUALITY,
         FF_DONTCARE, TEXT("Segoe UI")
     );
@@ -190,7 +190,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // Store instance handle in our global variable
 
-   HWND hWnd = CreateWindowExW(WS_EX_COMPOSITED,szWindowClass, szTitle, ((WS_OVERLAPPEDWINDOW ^ WS_SIZEBOX ^ WS_MAXIMIZE ^ WS_MAXIMIZEBOX )| WS_CLIPSIBLINGS |WS_CLIPCHILDREN ),
+   HWND hWnd = CreateWindowExW(WS_EX_COMPOSITED,szWindowClass, szTitle, ((WS_OVERLAPPEDWINDOW ^ WS_SIZEBOX  ^ WS_MAXIMIZEBOX )| WS_CLIPSIBLINGS |WS_CLIPCHILDREN ),
       CW_USEDEFAULT, 0, 750, 500, nullptr, nullptr, hInstance, nullptr);
    
    if (!hWnd)
@@ -198,7 +198,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
       return FALSE;
    }
 
-   ShowWindow(hWnd, nCmdShow);
+   ShowWindow(hWnd, SW_SHOWNORMAL);
    UpdateWindow(hWnd);
 
    return TRUE;
@@ -256,38 +256,38 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         
         SendMessage(hWnd, WM_SETFONT, (WPARAM)globalFont, NULL);
         HWND systemTime = CreateWindowEx(WS_EX_TRANSPARENT,L"static", szSYSTEMTIME, WS_CHILD  | WS_VISIBLE  | SS_LEFT ,
-            50 /*X×ø±ê*/, 10, 125, 25,
-            hWnd,		 //¸¸´°¿Ú¾ä±ú
-            NULL,	 //Îª¿Ø¼şÖ¸¶¨Ò»¸öÎ¨Ò»±êÊ¶·û
-            hInst,		 //µ±Ç°³ÌĞòÊµÀı¾ä±ú
+            50 /*Xåæ ‡*/, 10, 125, 25,
+            hWnd,		 //çˆ¶çª—å£å¥æŸ„
+            NULL,	 //ä¸ºæ§ä»¶æŒ‡å®šä¸€ä¸ªå”¯ä¸€æ ‡è¯†ç¬¦
+            hInst,		 //å½“å‰ç¨‹åºå®ä¾‹å¥æŸ„
             NULL);
         SendMessage(systemTime, WM_SETFONT, (WPARAM)globalFont, NULL);
         sysTime = CreateWindowEx(WS_EX_TRANSPARENT  ,L"static", L"", WS_CHILD | WS_VISIBLE | SS_LEFT | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-            175 /*X×ø±ê*/, 10, 300, 25,
-            hWnd,		 //¸¸´°¿Ú¾ä±ú
-            NULL,	 //Îª¿Ø¼şÖ¸¶¨Ò»¸öÎ¨Ò»±êÊ¶·û
-            hInst,		 //µ±Ç°³ÌĞòÊµÀı¾ä±ú
+            175 /*Xåæ ‡*/, 10, 300, 25,
+            hWnd,		 //çˆ¶çª—å£å¥æŸ„
+            NULL,	 //ä¸ºæ§ä»¶æŒ‡å®šä¸€ä¸ªå”¯ä¸€æ ‡è¯†ç¬¦
+            hInst,		 //å½“å‰ç¨‹åºå®ä¾‹å¥æŸ„
             NULL);
         SendMessage(sysTime, WM_SETFONT, (WPARAM)globalFont, NULL);
         HWND bootTime = CreateWindowEx(WS_EX_TRANSPARENT, L"static", szBOOTTIMESTRING, WS_CHILD | WS_VISIBLE | SS_LEFT,
-            50 /*X×ø±ê*/, 40, 125, 25,
-            hWnd,		 //¸¸´°¿Ú¾ä±ú
-            NULL,	 //Îª¿Ø¼şÖ¸¶¨Ò»¸öÎ¨Ò»±êÊ¶·û
-            hInst,		 //µ±Ç°³ÌĞòÊµÀı¾ä±ú
+            50 /*Xåæ ‡*/, 40, 125, 25,
+            hWnd,		 //çˆ¶çª—å£å¥æŸ„
+            NULL,	 //ä¸ºæ§ä»¶æŒ‡å®šä¸€ä¸ªå”¯ä¸€æ ‡è¯†ç¬¦
+            hInst,		 //å½“å‰ç¨‹åºå®ä¾‹å¥æŸ„
             NULL);
         SendMessage(bootTime, WM_SETFONT, (WPARAM)globalFont, NULL);
         boot = CreateWindowEx(WS_EX_TRANSPARENT , L"static", L"", WS_CHILD | WS_VISIBLE | SS_LEFT | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-            175 /*X×ø±ê*/, 40, 125, 25,
-            hWnd,		 //¸¸´°¿Ú¾ä±ú
-            NULL,	 //Îª¿Ø¼şÖ¸¶¨Ò»¸öÎ¨Ò»±êÊ¶·û
-            hInst,		 //µ±Ç°³ÌĞòÊµÀı¾ä±ú
+            175 /*Xåæ ‡*/, 40, 125, 25,
+            hWnd,		 //çˆ¶çª—å£å¥æŸ„
+            NULL,	 //ä¸ºæ§ä»¶æŒ‡å®šä¸€ä¸ªå”¯ä¸€æ ‡è¯†ç¬¦
+            hInst,		 //å½“å‰ç¨‹åºå®ä¾‹å¥æŸ„
             NULL);
         SendMessage(boot, WM_SETFONT, (WPARAM)globalFont, NULL);
         HWND netTime = CreateWindowEx(WS_EX_TRANSPARENT, L"static", szNETWORKTIMESTRING, WS_CHILD | WS_VISIBLE | SS_LEFT,
-            50 /*X×ø±ê*/, 70, 125, 25,
-            hWnd,		 //¸¸´°¿Ú¾ä±ú
-            NULL,	 //Îª¿Ø¼şÖ¸¶¨Ò»¸öÎ¨Ò»±êÊ¶·û
-            hInst,		 //µ±Ç°³ÌĞòÊµÀı¾ä±ú
+            50 /*Xåæ ‡*/, 70, 125, 25,
+            hWnd,		 //çˆ¶çª—å£å¥æŸ„
+            NULL,	 //ä¸ºæ§ä»¶æŒ‡å®šä¸€ä¸ªå”¯ä¸€æ ‡è¯†ç¬¦
+            hInst,		 //å½“å‰ç¨‹åºå®ä¾‹å¥æŸ„
             NULL);
         SendMessage(netTime, WM_SETFONT, (WPARAM)globalFont, NULL);
         SendMessage(hWnd, WM_SETFONT, (WPARAM)globalFont, NULL);
@@ -506,13 +506,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             //RECT clientRect;
             //GetClientRect(hWnd, &clientRect);
             //HBITMAP hBmp = CreateCompatibleBitmap(hdc_old, clientRect.right, clientRect.bottom);
-            //SelectObject(hdc, GetSysColorBrush(COLOR_3DFACE)); //ÉèÖÃË¢×ÓÑÕÉ« - Rectangle()µÄÌî³äÉ«
+            //SelectObject(hdc, GetSysColorBrush(COLOR_3DFACE)); //è®¾ç½®åˆ·å­é¢œè‰² - Rectangle()çš„å¡«å……è‰²
             //BitBlt(hdc_old, 0, 0, clientRect.right, clientRect.bottom, hdc, 0, 0, SRCCOPY);
             //DeleteObject(hBmp);
 
             //DeleteDC(hdc);
             //
-            //ReleaseDC(hWnd, hdc); //ÊÍ·Å 
+            //ReleaseDC(hWnd, hdc); //é‡Šæ”¾ 
             EndPaint(hWnd, &ps);
         }
         break;
