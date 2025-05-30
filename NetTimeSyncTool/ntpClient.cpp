@@ -1,4 +1,4 @@
-
+﻿
 /*
  * @Author: Neville Studio <2840772674@qq.com>
  * @Date: 2024-11-29 22:31:00
@@ -25,7 +25,7 @@
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
-using namespace std;
+//using namespace std;
 
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "123"
@@ -34,12 +34,12 @@ using namespace std;
 #define RECEIVER_ADDRESS_IPV6 "::1"
 //#define PORT 123
 
-wstring pluszero(int s);
+std::wstring pluszero(int s);
 unsigned long long NTPtoUTCTimeStamp(unsigned long long ntpTimeStamp);
-wstring transmitfromFileTime(FILETIME fileTime);
-wstring transmitToIP(unsigned int ip);
-wstring ConvertToASCII(unsigned int sourcename);
-wstring transmitToIPV6(unsigned int ip);
+std::wstring transmitfromFileTime(FILETIME fileTime);
+std::wstring transmitToIP(unsigned int ip);
+std::wstring ConvertToASCII(unsigned int sourcename);
+std::wstring transmitToIPV6(unsigned int ip);
 class NTPPackage {
 public:
 	unsigned char leap = 0;
@@ -327,10 +327,10 @@ int getNTPTime(char * ntpServerName, NTPResult &NTPres, int IPversion)
     return 0;
 }
 
-wstring plusdualzero(int s);
+std::wstring plusdualzero(int s);
 
 
-wstring transmitfromFileTime(FILETIME fileTime) {
+std::wstring transmitfromFileTime(FILETIME fileTime) {
     SYSTEMTIME systemTime = {};
     FILETIME localFileTime = {};
     FileTimeToLocalFileTime(&fileTime, &localFileTime);
@@ -338,29 +338,29 @@ wstring transmitfromFileTime(FILETIME fileTime) {
     int rrr = FileTimeToSystemTime(&localFileTime, &systemTime);
     //cout << fileTime.dwHighDateTime<<" "<<fileTime.dwLowDateTime<<" " << localFileTime.dwHighDateTime << " " << localFileTime.dwLowDateTime;
     //cout << rrr << endl;
-    if (rrr == 0)return to_wstring(GetLastError());
-    return to_wstring(systemTime.wYear) + L"/" + to_wstring(systemTime.wMonth) + L"/" + to_wstring(systemTime.wDay)
-        + L" " + to_wstring(systemTime.wHour) + L":" + pluszero(systemTime.wMinute) + L":" + pluszero(systemTime.wSecond)
+    if (rrr == 0)return std::to_wstring(GetLastError());
+    return std::to_wstring(systemTime.wYear) + L"/" + std::to_wstring(systemTime.wMonth) + L"/" + std::to_wstring(systemTime.wDay)
+        + L" " + std::to_wstring(systemTime.wHour) + L":" + pluszero(systemTime.wMinute) + L":" + pluszero(systemTime.wSecond)
         + L"." + plusdualzero(systemTime.wMilliseconds);
 }
-wstring NTPResult::pluszero(int s) {
-    if (s < 10)return L"0" + to_wstring(s);
-    else return to_wstring(s);
+std::wstring NTPResult::pluszero(int s) {
+    if (s < 10)return L"0" + std::to_wstring(s);
+    else return std::to_wstring(s);
 }
-wstring NTPResult::plusdualzero(int s) {
-    if (s < 100)return L"0" + to_wstring(s);
-    else if(s < 10)return L"00" + to_wstring(s);
-    else return to_wstring(s);
+std::wstring NTPResult::plusdualzero(int s) {
+    if (s < 100)return L"0" + std::to_wstring(s);
+    else if(s < 10)return L"00" + std::to_wstring(s);
+    else return std::to_wstring(s);
 }
 unsigned long long NTPtoUTCTimeStamp(unsigned long long ntpTimeStamp) {
     int flag = 0;
     if (((ntpTimeStamp & 0xffffffff00000000ULL) >> 32) < 0x80000000) flag = 1;
     return ((ntpTimeStamp & 0xffffffff00000000ULL) >> 32) * 10000000 + 94354848000000000ULL + (ntpTimeStamp & 0xffffffff) * 232 / 100000 + flag * 0x100000000*10000000 + epoch * 0x100000000*1000;//116444736000000000L - 2208988800* 10000000 ;
 }
-wstring transmitToIP(unsigned int ip) {
-    return to_wstring((ip & 0xff000000) >> 24) + L"." + to_wstring((ip & 0x00ff0000) >> 16) + L"." + to_wstring((ip & 0x0000ff00) >> 8) + L"." + to_wstring((ip & 0x000000ff));
+std::wstring transmitToIP(unsigned int ip) {
+    return std::to_wstring((ip & 0xff000000) >> 24) + L"." + std::to_wstring((ip & 0x00ff0000) >> 16) + L"." + std::to_wstring((ip & 0x0000ff00) >> 8) + L"." + std::to_wstring((ip & 0x000000ff));
 }
-wstring transmitToIPV6(unsigned int ip) {
+std::wstring transmitToIPV6(unsigned int ip) {
     std::wstringstream wss;
     wss << L"["; // Start of IPv6 address
     wss << std::hex << std::setw(4) << std::setfill(L'0') << ((ip & 0xFF000000) >> 24);
@@ -369,8 +369,8 @@ wstring transmitToIPV6(unsigned int ip) {
     wss << L":...]"; // End of IPv6 address
     return wss.str();
 }
-wstring ConvertToASCII(unsigned int sourcename) {
-    wstring result;
+std::wstring ConvertToASCII(unsigned int sourcename) {
+    std::wstring result;
     result += static_cast<wchar_t>((sourcename & 0xFF000000) >> 24);
     result += static_cast<wchar_t>((sourcename & 0x00FF0000) >> 16);
     result += static_cast<wchar_t>((sourcename & 0x0000FF00) >> 8);
@@ -378,12 +378,12 @@ wstring ConvertToASCII(unsigned int sourcename) {
     return result;
 }
 
-wstring NTPResult::getTime() {
+std::wstring NTPResult::getTime() {
     FILETIME filetime;
     filetime.dwHighDateTime = this->timeStamp >> 32;
     filetime.dwLowDateTime = this->timeStamp & 0xffffffff;
     return transmitfromFileTime(filetime);
 }
-wstring NTPResult::getUpdateTime() {
-    return to_wstring(updateTime/3600000) + L":" + pluszero(updateTime/60000%60) + L":" + pluszero(updateTime/1000%60) + L"." + plusdualzero(updateTime%1000);
+std::wstring NTPResult::getUpdateTime() {
+    return std::to_wstring(updateTime/3600000) + L":" + pluszero(updateTime/60000%60) + L":" + pluszero(updateTime/1000%60) + L"." + plusdualzero(updateTime%1000);
 }

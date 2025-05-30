@@ -62,6 +62,7 @@ HFONT globalFont;
 GlobalData ntpServers;
 bool OKSync = false;
 DWORD WINAPI resync(LPVOID lparam);
+BOOL isWindows10Version14393OrLater();
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
@@ -123,6 +124,19 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         PostQuitMessage(setTimeError);
         return setTimeError;
     }
+
+	//Judge Windows 10, version 14393 or later
+    if(isWindows10Version14393OrLater()) {
+        SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+	}
+	//if (VerifyVersionInfo(10, 0, 14393) == TRUE), VerifyVersionInfo is deprecated, use VerifyVersionInfoEx instead.
+	//{
+	//	SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+	//}
+    /*if(VerifyVersionInfo(10,0,14393) == TRUE)
+    {
+		SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+	}*/
     if (!InitInstance (hInstance, nCmdShow))
     {
         return FALSE;
@@ -147,7 +161,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     return (int) msg.wParam;
 }
 
-
+BOOL isWindows10Version14393OrLater()
+{
+    OSVERSIONINFOEXW osvi = { sizeof(OSVERSIONINFOEXW) };
+    osvi.dwMajorVersion = 10;
+    osvi.dwMinorVersion = 0;
+    osvi.dwBuildNumber = 14393;
+    DWORDLONG dwlConditionMask = 0;
+    VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, VER_GREATER_EQUAL);
+    VER_SET_CONDITION(dwlConditionMask, VER_MINORVERSION, VER_GREATER_EQUAL);
+    VER_SET_CONDITION(dwlConditionMask, VER_BUILDNUMBER, VER_GREATER_EQUAL);
+    return VerifyVersionInfoW(&osvi, VER_MAJORVERSION | VER_MINORVERSION | VER_BUILDNUMBER, dwlConditionMask) != 0;
+}
 
 //
 //  FUNCTION: MyRegisterClass()

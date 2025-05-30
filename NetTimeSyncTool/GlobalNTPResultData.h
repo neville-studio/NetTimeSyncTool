@@ -1,11 +1,11 @@
-#pragma once
+﻿#pragma once
 #include <vector>
 #include "NtpClient.h"
-using namespace std;
+//using namespace std;
 class GlobalData {
 public:
-	vector<NTPResult> globalData;
+	std::vector<NTPResult> globalData;
 	GlobalData();
-	vector <string> servers;
+	std::vector <std::string> servers;
 	~GlobalData();
 };

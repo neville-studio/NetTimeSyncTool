@@ -5,12 +5,13 @@
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   xmlns:uap18="http://schemas.microsoft.com/appx/manifest/uap/windows10/18"
-  IgnorableNamespaces="uap rescap uap18">
+  xmlns:iot="http://schemas.microsoft.com/appx/manifest/iot/windows10"
+  IgnorableNamespaces="uap rescap uap18 iot">
 
   <Identity
     Name="69e52b93-1dc4-4adc-96f0-dd13ba8af047"
     Publisher="CN=Neville Studio"
-    Version="1.0.5.0" />
+    Version="1.0.6.0" />
 
   <Properties>
     <DisplayName>NetTimeSyncToolInstaller</DisplayName>
@@ -49,5 +50,6 @@
   <Capabilities>
     <Capability Name="internetClient" />
     <rescap:Capability Name="runFullTrust" />
+    <iot:Capability Name="systemManagement"/>
   </Capabilities>
 </Package>

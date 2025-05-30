@@ -1,4 +1,4 @@
-/*
+﻿/*
  * @Author: Neville Studio <2840772674@qq.com>
  * @Date: 2024-11-29 22:27:06
  * @Function: NTP list logics.
@@ -153,7 +153,7 @@ BOOL setNTPItem(HWND hWndListView, int num, NTPResult res)
     ListView_SetItem(hWndListView, &item);
     return TRUE;
 }
-BOOL setItemStatus(HWND hWndListView, int num, wstring status)
+BOOL setItemStatus(HWND hWndListView, int num, std::wstring status)
 {
     LV_ITEM item;
     item.mask = LVIF_TEXT;
