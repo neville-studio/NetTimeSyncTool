@@ -14,7 +14,7 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <ShlObj.h>
-std::string getMsixWritablePath(const std::string& filename);
+std::string getWritableFilename();
 bool isMsixEnvironment();
 #endif
 
