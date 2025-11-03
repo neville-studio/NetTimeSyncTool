@@ -288,7 +288,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             NULL);
         SendMessage(systemTime, WM_SETFONT, (WPARAM)globalFont, NULL);
         sysTime = CreateWindowEx(WS_EX_TRANSPARENT  ,L"static", L"", WS_CHILD | WS_VISIBLE | SS_LEFT | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-            175 /*X坐标*/, 10, 300, 25,
+            175 /*X坐标*/, 10, 500, 25,
             hWnd,		 //父窗口句柄
             NULL,	 //为控件指定一个唯一标识符
             hInst,		 //当前程序实例句柄

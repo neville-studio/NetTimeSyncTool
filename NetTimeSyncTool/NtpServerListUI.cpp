@@ -119,7 +119,7 @@ BOOL UpdateNTPTime(HWND hWndListView, int num, NTPResult res)
     systemTimeStr = FileTime2SystemTime(filetime);
     
 
-    WCHAR resTime[30] = L"";
+    WCHAR resTime[100] = L"";
     item.pszText = resTime;
     ListView_GetItem(hWndListView, &item);
     if (wcscmp(systemTimeStr.c_str(),resTime))
