@@ -63,7 +63,7 @@ We use MIT License to allow you to using this code. see [license](./LICENSE)
 
 可以在Windows上重新同步您的网络时钟
 
-您的电脑必须安装Microsoft Visual C++ 2022 Redistributable.
+您的电脑必须安装Microsoft Visual C++ v14 Redistributable.
 
 此软件基于Microsoft Visual Studio 2022构建
 
